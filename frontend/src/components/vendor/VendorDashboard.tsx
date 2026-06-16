@@ -6,7 +6,7 @@ import { Building2, CalendarCheck, DollarSign, Loader2, Star, TrendingUp } from 
 import { AddVenueModal } from './AddVenueModal';
 
 export const VendorDashboard: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isVendor } = useAuthStore();
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({
@@ -40,8 +40,12 @@ export const VendorDashboard: React.FC = () => {
       navigate('/login');
       return;
     }
+    if (!isVendor) {
+      navigate('/');
+      return;
+    }
     fetchDashboardData();
-  }, [isAuthenticated, navigate, fetchDashboardData]);
+  }, [isAuthenticated, isVendor, navigate, fetchDashboardData]);
 
   const handleVenueAdded = () => {
     setIsModalOpen(false);

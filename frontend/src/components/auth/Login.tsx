@@ -31,10 +31,18 @@ export const Login: React.FC = () => {
       // Update Axios defaults
       apiClient.defaults.headers['Authorization'] = `Bearer ${access}`;
       
-      // Update global state (Assuming true for the demo so they can see the dashboard)
-      login(access, true);
+      // Fetch user profile to get the real role
+      const meResponse = await apiClient.get('/me/');
+      const isVendorUser = meResponse.data.role === 'vendor';
       
-      navigate('/vendor-dashboard');
+      // Update global state
+      login(access, isVendorUser);
+      
+      if (isVendorUser) {
+        navigate('/vendor-dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       console.error('Login error', err);
       setError('Invalid credentials. Please try again.');

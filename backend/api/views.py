@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Sum
-from .models import Venue, EventLocation, Booking, Transaction
+from .models import Venue, EventLocation, Booking, Transaction, UserProfile
 from .serializers import VenueSerializer, EventLocationSerializer, BookingSerializer
+from .permissions import IsVendor
 import time
 import uuid
 
@@ -42,7 +43,25 @@ class SignupView(APIView):
             last_name=last_name
         )
 
+        UserProfile.objects.create(user=user, role=role)
+
         return Response({'success': 'User registered successfully'}, status=status.HTTP_201_CREATED)
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        role = 'customer'
+        if hasattr(request.user, 'profile'):
+            role = request.user.profile.role
+            
+        return Response({
+            'username': request.user.username,
+            'email': request.user.email,
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'role': role
+        })
 
 class ProcessPaymentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -89,7 +108,7 @@ class ProcessPaymentView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 class VendorDashboardView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVendor]
 
     def get(self, request):
         # Find venues owned by this user
@@ -109,7 +128,7 @@ class VendorDashboardView(APIView):
         })
 
 class VendorBookingsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVendor]
 
     def get(self, request):
         vendor_venues = Venue.objects.filter(vendor=request.user)
@@ -118,7 +137,7 @@ class VendorBookingsView(APIView):
         return Response(serializer.data)
 
 class VendorVenueCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsVendor]
 
     def post(self, request):
         name = request.data.get('name')
