@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { ExploreHub } from './components/venue/ExploreHub';
-import { VendorProfile } from './components/vendor/VendorProfile';
+import { VenueDetails } from './components/venue/VenueDetails';
 import { VendorDashboard } from './components/vendor/VendorDashboard';
 import { Checkout } from './components/booking/Checkout';
 import { Login } from './components/auth/Login';
@@ -48,11 +48,6 @@ function Navigation() {
       <Link to="/" className="text-2xl font-extrabold text-emerald-400 tracking-tight">Locyfy.</Link>
       
       <div className="flex gap-4 items-center">
-        <Link to="/vendor/v1" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Sample Vendor</Link>
-        <Link to="/checkout" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Checkout UI</Link>
-        
-        <div className="w-px h-6 bg-gray-700 mx-2"></div>
-        
         {isAuthenticated ? (
           <>
              {isVendor && (
@@ -80,7 +75,7 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<ExploreHub initialVenues={mockVenues} />} />
-            <Route path="/vendor/:id" element={<VendorProfile />} />
+            <Route path="/venue/:id" element={<VenueDetails />} />
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />

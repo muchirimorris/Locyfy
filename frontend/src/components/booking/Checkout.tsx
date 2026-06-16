@@ -1,49 +1,63 @@
-import React, { useState } from 'react';
-import { ShieldCheck, CreditCard, Smartphone, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { ShieldCheck, Calendar, CheckCircle2, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import apiClient from '../../services/apiClient';
 
 export const Checkout: React.FC = () => {
-  const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'card'>('mpesa');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Read dynamic values passed from the Venue Details page
+  const { venueId, venueName, totalAmount, packageType } = location.state || {};
+
+  const [date, setDate] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [step, setStep] = useState<'details' | 'payment' | 'success'>('details');
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success' | 'failed' | null>(null);
   const [bookingRef, setBookingRef] = useState('');
 
-  // Hardcoded for demo purposes as we don't have global state for the selected venue yet.
-  const VENUE_ID = 1; // Assuming the first venue created in Django has ID=1
-  const TOTAL_AMOUNT = 168300; 
-  const BOOKING_DATE = '2025-10-24';
+  useEffect(() => {
+    // If someone manually goes to /checkout without selecting a venue, bounce them back to the home page.
+    if (!venueId) {
+      navigate('/');
+    }
+  }, [venueId, navigate]);
 
-  const handlePayment = async () => {
-    setLoading(true);
-    setError(null);
-    
+  if (!venueId) return null;
+
+  const handleMpesaPayment = async () => {
+    if (!phoneNumber.match(/^(?:254|\+254|0)?(7[0-9]{8}|1[0-9]{8})$/)) {
+      alert("Please enter a valid Kenyan phone number.");
+      return;
+    }
+
+    setProcessing(true);
+    setPaymentStatus('pending');
+
     try {
+      // 1. Hit our Process Payment Endpoint
       const response = await apiClient.post('/bookings/process_payment/', {
-        venue_id: VENUE_ID,
-        booking_date: BOOKING_DATE,
-        total_amount: TOTAL_AMOUNT,
-        payment_method: paymentMethod === 'mpesa' ? 'M-PESA' : 'Card'
+        venue_id: venueId,
+        booking_date: date,
+        total_amount: totalAmount,
+        phone_number: phoneNumber
       });
 
-      // API automatically fakes a 1.5s delay to simulate M-PESA STK Push
+      // 2. STK Push simulated success
       setBookingRef(response.data.booking.transaction.transaction_reference);
-      setSuccess(true);
-    } catch (err: any) {
-      console.error('Payment failed', err);
-      // In case they aren't logged in, catch the 401
-      if (err.response?.status === 401) {
-          setError("You must log in to securely complete your booking.");
-      } else {
-          setError(err.response?.data?.error || "Payment verification failed. Please try again.");
-      }
+      setPaymentStatus('success');
+      setStep('success');
+
+    } catch (error) {
+      console.error("Payment failed", error);
+      setPaymentStatus('failed');
     } finally {
-      setLoading(false);
+      setProcessing(false);
     }
   };
 
-  if (success) {
+  if (step === 'success') {
       return (
           <div className="min-h-screen bg-emerald-50 flex items-center justify-center p-6">
               <div className="bg-white max-w-md w-full rounded-3xl p-10 text-center shadow-xl border border-emerald-100">
@@ -58,10 +72,10 @@ export const Checkout: React.FC = () => {
                       <p className="font-mono text-gray-900 font-bold mb-4">{bookingRef}</p>
                       
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Venue</p>
-                      <p className="text-gray-900 font-bold mb-4">Karura Forest Event Grounds</p>
-
+                      <p className="text-gray-900 font-bold mb-4">{venueName}</p>
+                      
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Amount Paid</p>
-                      <p className="text-emerald-600 font-black text-xl">Ksh {TOTAL_AMOUNT.toLocaleString()}</p>
+                      <p className="text-emerald-600 font-black text-xl">Ksh {totalAmount.toLocaleString()}</p>
                   </div>
 
                   <Link to="/" className="w-full block py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-colors">
@@ -76,6 +90,19 @@ export const Checkout: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-6 lg:px-12">
       <div className="max-w-5xl mx-auto">
         
+        {/* Progress Bar */}
+        <div className="flex items-center justify-center mb-10">
+          <div className={`flex items-center gap-2 ${step === 'details' ? 'text-emerald-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 'details' ? 'bg-emerald-100' : 'bg-gray-200'}`}>1</div>
+            <span className="font-bold text-sm">Booking Details</span>
+          </div>
+          <div className="w-16 h-px bg-gray-300 mx-4"></div>
+          <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-emerald-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 'payment' ? 'bg-emerald-100' : 'bg-gray-200'}`}>2</div>
+            <span className="font-bold text-sm">Escrow Payment</span>
+          </div>
+        </div>
+
         {/* Trust Banner */}
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-8 flex items-start gap-4 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
@@ -89,83 +116,95 @@ export const Checkout: React.FC = () => {
           </div>
         </div>
 
-        {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-8 font-bold text-center border border-red-100">
-                {error}
-            </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           
-          {/* Payment UI */}
+          {/* Main Column */}
           <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-              <h2 className="text-2xl font-extrabold text-gray-900 mb-6">Payment Method</h2>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                {/* M-PESA Option */}
-                <div 
-                  onClick={() => setPaymentMethod('mpesa')}
-                  className={`flex-1 flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'mpesa' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 hover:border-gray-300'}`}
-                >
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'mpesa' ? 'border-emerald-500' : 'border-gray-300'}`}>
-                    {paymentMethod === 'mpesa' && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
+              {/* Step 1: Details */}
+              {step === 'details' && (
+                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <Calendar className="w-6 h-6 text-emerald-500" /> Secure Your Date
+                  </h2>
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Event Date</label>
+                    <input 
+                      type="date" 
+                      required
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
+                    />
                   </div>
-                  <Smartphone className={`w-6 h-6 ${paymentMethod === 'mpesa' ? 'text-emerald-600' : 'text-gray-400'}`} />
-                  <span className={`font-bold ${paymentMethod === 'mpesa' ? 'text-gray-900' : 'text-gray-600'}`}>M-PESA (STK Push)</span>
-                </div>
-
-                {/* Card Option */}
-                <div 
-                  onClick={() => setPaymentMethod('card')}
-                  className={`flex-1 flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 hover:border-gray-300'}`}
-                >
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'card' ? 'border-emerald-500' : 'border-gray-300'}`}>
-                    {paymentMethod === 'card' && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
-                  </div>
-                  <CreditCard className={`w-6 h-6 ${paymentMethod === 'card' ? 'text-emerald-600' : 'text-gray-400'}`} />
-                  <span className={`font-bold ${paymentMethod === 'card' ? 'text-gray-900' : 'text-gray-600'}`}>Credit / Debit Card</span>
-                </div>
-              </div>
-
-              {/* M-PESA Form */}
-              {paymentMethod === 'mpesa' && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                   <label className="block text-sm font-bold text-gray-700 mb-2">M-PESA Phone Number</label>
-                   <div className="flex gap-2">
-                     <span className="inline-flex items-center px-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 font-bold">
-                       +254
-                     </span>
-                     <input 
-                       type="text" 
-                       placeholder="712 345 678" 
-                       className="flex-grow w-full border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow"
-                     />
-                   </div>
-                   <p className="text-xs text-gray-500 mt-2 font-medium">You will receive a prompt on your phone to enter your M-PESA PIN.</p>
+                  <button 
+                    disabled={!date}
+                    onClick={() => setStep('payment')}
+                    className="w-full py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  >
+                    Continue to Payment <ArrowRight className="w-5 h-5" />
+                  </button>
                 </div>
               )}
 
-              {/* Card Form Mock */}
-              {paymentMethod === 'card' && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-                   <div>
-                     <label className="block text-sm font-bold text-gray-700 mb-2">Card Number</label>
-                     <input type="text" placeholder="0000 0000 0000 0000" className="w-full border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                   </div>
-                   <div className="flex gap-4">
-                     <div className="flex-1">
-                       <label className="block text-sm font-bold text-gray-700 mb-2">Expiry</label>
-                       <input type="text" placeholder="MM/YY" className="w-full border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                     </div>
-                     <div className="flex-1">
-                       <label className="block text-sm font-bold text-gray-700 mb-2">CVC</label>
-                       <input type="text" placeholder="123" className="w-full border border-gray-200 rounded-xl px-4 py-3 font-medium text-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none" />
-                     </div>
-                   </div>
+              {/* Step 2: Payment */}
+              {step === 'payment' && (
+                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                      <Lock className="w-6 h-6 text-emerald-500" /> Escrow Payment
+                    </h2>
+                    <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">
+                      Protected by Locyfy
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm mb-8 leading-relaxed">
+                    Your funds are held securely in a Locyfy Escrow account. The vendor only receives payment 48 hours after your event concludes successfully.
+                  </p>
+
+                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2 relative z-10">M-PESA Phone Number</label>
+                    <div className="relative z-10 flex gap-2 items-center">
+                      <span className="inline-flex items-center px-4 py-4 rounded-xl border border-gray-200 bg-white text-gray-500 font-bold">
+                        +254
+                      </span>
+                      <input 
+                        type="tel" 
+                        placeholder="712 345 678"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="flex-grow w-full pl-4 pr-4 py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-gray-900 text-lg tracking-wide"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-3 font-medium relative z-10">A payment prompt will be sent to this number.</p>
+                  </div>
+
+                  {paymentStatus === 'failed' && (
+                    <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-bold flex items-center gap-2 border border-red-100">
+                      <AlertCircle className="w-5 h-5" /> Payment failed or was cancelled. Try again.
+                    </div>
+                  )}
+
+                  <button 
+                    onClick={handleMpesaPayment}
+                    disabled={processing || !phoneNumber}
+                    className="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {processing ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Waiting for STK Push Pin...</>
+                    ) : (
+                      `Pay Ksh ${(totalAmount * 1.015).toLocaleString()} via M-PESA`
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => setStep('details')}
+                    className="w-full py-3 text-gray-500 font-bold hover:text-gray-900 mt-2 transition-colors text-center"
+                  >
+                    Back to Details
+                  </button>
                 </div>
               )}
-            </div>
           </div>
 
           {/* Price Breakdown Sidebar */}
@@ -175,39 +214,25 @@ export const Checkout: React.FC = () => {
               
               <div className="mb-6">
                 <p className="text-gray-400 text-sm font-medium mb-1">Venue</p>
-                <p className="font-bold text-lg">Karura Forest Event Grounds</p>
-                <p className="text-gray-400 text-sm">Oct 24, 2025 • Full Day</p>
+                <p className="font-bold text-lg">{venueName}</p>
+                {date && <p className="text-gray-400 text-sm mt-1">{new Date(date).toLocaleDateString()} • Full Day</p>}
               </div>
 
               <div className="space-y-4 mb-6 pb-6 border-b border-gray-800">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-300 font-medium">Traditional Ruracio Package</span>
-                  <span className="font-bold">Ksh 150,000</span>
+                  <span className="text-gray-300 font-medium">{packageType || 'Base Venue Booking'}</span>
+                  <span className="font-bold">Ksh {totalAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-300 font-medium">Backup Generator Add-on</span>
-                  <span className="font-bold">Ksh 15,000</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300 font-medium">Locyfy Service Fee (2%)</span>
-                  <span className="font-bold">Ksh 3,300</span>
+                  <span className="text-gray-300 font-medium">Locyfy Escrow Fee (1.5%)</span>
+                  <span className="font-bold">Ksh {(totalAmount * 0.015).toLocaleString()}</span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center mb-8">
                 <span className="text-gray-300 font-medium">Total Due Today</span>
-                <span className="text-2xl font-black text-emerald-400">Ksh 168,300</span>
+                <span className="text-2xl font-black text-emerald-400">Ksh {(totalAmount * 1.015).toLocaleString()}</span>
               </div>
-
-              <button 
-                onClick={handlePayment}
-                disabled={loading}
-                className="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
-              >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                  <>Confirm & Pay <ArrowRight className="w-5 h-5" /></>
-                )}
-              </button>
               
               <p className="text-center text-xs text-gray-500 mt-4 font-medium flex items-center justify-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Secure Encrypted Checkout

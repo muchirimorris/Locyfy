@@ -8,7 +8,10 @@ interface ExploreHubProps {
   initialVenues: Venue[];
 }
 
+import { useNavigate } from 'react-router-dom';
+
 export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
+  const navigate = useNavigate();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,10 +48,10 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
   const filteredVenues = useMemo(() => {
     return venues.filter(venue => {
       const matchesSearch = venue.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            venue.eventLocation.subCounty.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCounty = selectedCounty === 'All' || venue.eventLocation.county === selectedCounty;
-      const matchesTerrain = selectedTerrain === 'All' || venue.eventLocation.terrain === selectedTerrain;
-      const matchesIdeal = selectedIdealFor === 'All' || venue.eventLocation.idealFor.includes(selectedIdealFor as any);
+                            venue.eventLocation?.subCounty.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCounty = selectedCounty === 'All' || venue.eventLocation?.county === selectedCounty;
+      const matchesTerrain = selectedTerrain === 'All' || venue.eventLocation?.terrain === selectedTerrain;
+      const matchesIdeal = selectedIdealFor === 'All' || venue.eventLocation?.idealFor?.includes(selectedIdealFor as any);
 
       return matchesSearch && matchesCounty && matchesTerrain && matchesIdeal;
     });
@@ -189,7 +192,7 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
           ) : filteredVenues.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               {filteredVenues.map((venue) => (
-                <VenueCard key={venue.id} venue={venue} onClick={(id) => console.log('Navigate to venue', id)} />
+                <VenueCard key={venue.id} venue={venue} onClick={(id) => navigate(`/venue/${id}`)} />
               ))}
             </div>
           ) : (
