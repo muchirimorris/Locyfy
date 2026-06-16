@@ -1,13 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, SlidersHorizontal, Map } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, SlidersHorizontal, Map, Loader2, AlertCircle } from 'lucide-react';
 import { VenueCard } from './VenueCard';
 import type { Venue } from '../../types/venue';
+import { venueService } from '../../services/venueService';
 
 interface ExploreHubProps {
   initialVenues: Venue[];
 }
 
 export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCounty, setSelectedCounty] = useState<string>('All');
   const [selectedTerrain, setSelectedTerrain] = useState<string>('All');
@@ -17,8 +22,28 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
   const terrains = ['All', 'Manicured Gardens', 'Indoor Hall', 'Rooftop', 'Lakeside', 'Forest'];
   const idealForOptions = ['All', 'Weddings', 'Corporate', 'Concerts', 'Photo Shoots', 'Chama Meetings'];
 
+  useEffect(() => {
+    const fetchVenues = async () => {
+      try {
+        setLoading(true);
+        // Attempt to fetch from Django Backend
+        const data = await venueService.getVenues();
+        setVenues(data);
+        setError(null);
+      } catch (err) {
+        console.error('API Connection failed (Django might be offline):', err);
+        setError('Cannot connect to live server. Falling back to demo data.');
+        setVenues(initialVenues);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVenues();
+  }, [initialVenues]);
+
   const filteredVenues = useMemo(() => {
-    return initialVenues.filter(venue => {
+    return venues.filter(venue => {
       const matchesSearch = venue.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             venue.eventLocation.subCounty.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCounty = selectedCounty === 'All' || venue.eventLocation.county === selectedCounty;
@@ -27,7 +52,7 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
 
       return matchesSearch && matchesCounty && matchesTerrain && matchesIdeal;
     });
-  }, [initialVenues, searchQuery, selectedCounty, selectedTerrain, selectedIdealFor]);
+  }, [venues, searchQuery, selectedCounty, selectedTerrain, selectedIdealFor]);
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -70,6 +95,16 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
           </div>
         </div>
       </div>
+
+      {/* Global Error Banner */}
+      {error && (
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 mt-6">
+          <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex flex-col lg:flex-row gap-10">
         
@@ -146,7 +181,12 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
             </div>
           </div>
 
-          {filteredVenues.length > 0 ? (
+          {loading ? (
+             <div className="flex flex-col items-center justify-center py-32">
+                <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
+                <h3 className="text-lg font-bold text-gray-900">Fetching verified venues...</h3>
+             </div>
+          ) : filteredVenues.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               {filteredVenues.map((venue) => (
                 <VenueCard key={venue.id} venue={venue} onClick={(id) => console.log('Navigate to venue', id)} />
