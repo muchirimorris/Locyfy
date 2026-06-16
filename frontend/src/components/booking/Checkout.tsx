@@ -1,8 +1,76 @@
 import React, { useState } from 'react';
-import { ShieldCheck, CreditCard, Smartphone, ArrowRight } from 'lucide-react';
+import { ShieldCheck, CreditCard, Smartphone, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import apiClient from '../../services/apiClient';
 
 export const Checkout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'card'>('mpesa');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [bookingRef, setBookingRef] = useState('');
+
+  // Hardcoded for demo purposes as we don't have global state for the selected venue yet.
+  const VENUE_ID = 1; // Assuming the first venue created in Django has ID=1
+  const TOTAL_AMOUNT = 168300; 
+  const BOOKING_DATE = '2025-10-24';
+
+  const handlePayment = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await apiClient.post('/bookings/process_payment/', {
+        venue_id: VENUE_ID,
+        booking_date: BOOKING_DATE,
+        total_amount: TOTAL_AMOUNT,
+        payment_method: paymentMethod === 'mpesa' ? 'M-PESA' : 'Card'
+      });
+
+      // API automatically fakes a 1.5s delay to simulate M-PESA STK Push
+      setBookingRef(response.data.booking.transaction.transaction_reference);
+      setSuccess(true);
+    } catch (err: any) {
+      console.error('Payment failed', err);
+      // In case they aren't logged in, catch the 401
+      if (err.response?.status === 401) {
+          setError("You must log in to securely complete your booking.");
+      } else {
+          setError(err.response?.data?.error || "Payment verification failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+      return (
+          <div className="min-h-screen bg-emerald-50 flex items-center justify-center p-6">
+              <div className="bg-white max-w-md w-full rounded-3xl p-10 text-center shadow-xl border border-emerald-100">
+                  <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+                  </div>
+                  <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Booking Confirmed!</h1>
+                  <p className="text-gray-500 font-medium mb-8">Your payment was securely verified and held in Escrow.</p>
+                  
+                  <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left border border-gray-100">
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Transaction Ref</p>
+                      <p className="font-mono text-gray-900 font-bold mb-4">{bookingRef}</p>
+                      
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Venue</p>
+                      <p className="text-gray-900 font-bold mb-4">Karura Forest Event Grounds</p>
+
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Amount Paid</p>
+                      <p className="text-emerald-600 font-black text-xl">Ksh {TOTAL_AMOUNT.toLocaleString()}</p>
+                  </div>
+
+                  <Link to="/" className="w-full block py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-colors">
+                      Back to Dashboard
+                  </Link>
+              </div>
+          </div>
+      );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-6 lg:px-12">
@@ -20,6 +88,12 @@ export const Checkout: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-8 font-bold text-center border border-red-100">
+                {error}
+            </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           
@@ -125,8 +199,14 @@ export const Checkout: React.FC = () => {
                 <span className="text-2xl font-black text-emerald-400">Ksh 168,300</span>
               </div>
 
-              <button className="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
-                Confirm & Pay <ArrowRight className="w-5 h-5" />
+              <button 
+                onClick={handlePayment}
+                disabled={loading}
+                className="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                  <>Confirm & Pay <ArrowRight className="w-5 h-5" /></>
+                )}
               </button>
               
               <p className="text-center text-xs text-gray-500 mt-4 font-medium flex items-center justify-center gap-1">

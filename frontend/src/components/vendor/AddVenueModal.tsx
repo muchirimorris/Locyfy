@@ -1,0 +1,192 @@
+import React, { useState } from 'react';
+import { X, Image, MapPin, Loader2 } from 'lucide-react';
+import apiClient from '../../services/apiClient';
+
+interface AddVenueModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    imageUrl: '',
+    pricePerDay: '',
+    capacity: '',
+    county: 'Nairobi',
+    subCounty: '',
+    terrain: 'Manicured Gardens',
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      await apiClient.post('/vendor/venues/', formData);
+      onSuccess();
+    } catch (err: any) {
+      console.error('Failed to create venue', err);
+      setError(err.response?.data?.error || 'Failed to add venue. Please check your inputs.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="text-xl font-extrabold text-gray-900">Add New Venue</h2>
+          <button 
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[80vh]">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-6 text-sm font-bold text-center">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-6">
+            
+            {/* Name & Desc */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Venue Name</label>
+              <input 
+                type="text" required
+                placeholder="e.g. Karura Forest Event Grounds"
+                value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+              <textarea 
+                rows={3} required
+                placeholder="Describe your beautiful venue..."
+                value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900 resize-none"
+              />
+            </div>
+
+            {/* Image URL */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">High-Res Image URL</label>
+              <div className="relative">
+                <Image className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type="url" required
+                  placeholder="https://images.unsplash.com/photo-..."
+                  value={formData.imageUrl} onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
+                />
+              </div>
+            </div>
+
+            {/* Details Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Price Per Day (Ksh)</label>
+                <div className="relative">
+                   {/* We're in Kenya, so KES! */}
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Ksh</span>
+                  <input 
+                    type="number" required min="1000"
+                    placeholder="150000"
+                    value={formData.pricePerDay} onChange={(e) => setFormData({...formData, pricePerDay: e.target.value})}
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Max Capacity</label>
+                <input 
+                  type="number" required min="10"
+                  placeholder="300"
+                  value={formData.capacity} onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
+                />
+              </div>
+            </div>
+
+            {/* Location Row */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2"><MapPin className="w-4 h-4 text-emerald-600"/> Event Location Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">County</label>
+                  <select 
+                    value={formData.county} onChange={(e) => setFormData({...formData, county: e.target.value})}
+                    className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
+                  >
+                    <option value="Nairobi">Nairobi</option>
+                    <option value="Nyeri">Nyeri</option>
+                    <option value="Kiambu">Kiambu</option>
+                    <option value="Nakuru">Nakuru</option>
+                    <option value="Mombasa">Mombasa</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Sub-County / Area</label>
+                  <input 
+                    type="text" required placeholder="e.g. Gigiri"
+                    value={formData.subCounty} onChange={(e) => setFormData({...formData, subCounty: e.target.value})}
+                    className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Terrain Setup</label>
+                  <select 
+                    value={formData.terrain} onChange={(e) => setFormData({...formData, terrain: e.target.value})}
+                    className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
+                  >
+                    <option value="Manicured Gardens">Manicured Gardens</option>
+                    <option value="Indoor Hall">Indoor Hall</option>
+                    <option value="Rooftop">Rooftop</option>
+                    <option value="Lakeside">Lakeside</option>
+                    <option value="Forest">Forest</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="mt-8 flex justify-end gap-3">
+            <button 
+              type="button" 
+              onClick={onClose}
+              className="px-6 py-3 font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 shadow-lg"
+            >
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Publish Venue'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};

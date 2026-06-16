@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { ExploreHub } from './components/venue/ExploreHub';
 import { VendorProfile } from './components/vendor/VendorProfile';
+import { VendorDashboard } from './components/vendor/VendorDashboard';
 import { Checkout } from './components/booking/Checkout';
+import { Login } from './components/auth/Login';
+import { Register } from './components/auth/Register';
+import { useAuthStore } from './store/authStore';
 import type { Venue } from './types/venue';
+import apiClient from './services/apiClient';
 
 const mockVenues: Venue[] = [
-  // Keeping just one mock venue here to keep it concise, since the focus is switching views
   {
     id: 'v1',
     name: 'Karura Forest Event Grounds',
@@ -26,38 +30,65 @@ const mockVenues: Venue[] = [
   }
 ];
 
-function App() {
-  const [currentView, setCurrentView] = useState<'explore' | 'vendor' | 'checkout'>('explore');
+// Inner component so we can use hooks like useNavigate
+function Navigation() {
+  const { isAuthenticated, isVendor, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    delete apiClient.defaults.headers['Authorization'];
+    navigate('/');
+  };
 
   return (
-    <div>
-      {/* Dev Navigation Bar - strictly for the client demo to switch screens */}
-      <div className="bg-gray-900 text-white p-4 flex gap-4 justify-center shadow-lg sticky top-0 z-50">
-        <span className="font-bold mr-4 text-emerald-400">Locyfy Demo Navigation:</span>
-        <button 
-          className={`px-4 py-1 rounded-full font-medium text-sm transition-colors ${currentView === 'explore' ? 'bg-emerald-500' : 'bg-gray-800 hover:bg-gray-700'}`}
-          onClick={() => setCurrentView('explore')}
-        >
-          1. Explore Hub
-        </button>
-        <button 
-          className={`px-4 py-1 rounded-full font-medium text-sm transition-colors ${currentView === 'vendor' ? 'bg-emerald-500' : 'bg-gray-800 hover:bg-gray-700'}`}
-          onClick={() => setCurrentView('vendor')}
-        >
-          2. Vendor Profile
-        </button>
-        <button 
-          className={`px-4 py-1 rounded-full font-medium text-sm transition-colors ${currentView === 'checkout' ? 'bg-emerald-500' : 'bg-gray-800 hover:bg-gray-700'}`}
-          onClick={() => setCurrentView('checkout')}
-        >
-          3. Checkout & Payment
-        </button>
+    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
+      <Link to="/" className="text-2xl font-extrabold text-emerald-400 tracking-tight">Locyfy.</Link>
+      
+      <div className="flex gap-4 items-center">
+        <Link to="/vendor/v1" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Sample Vendor</Link>
+        <Link to="/checkout" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Checkout UI</Link>
+        
+        <div className="w-px h-6 bg-gray-700 mx-2"></div>
+        
+        {isAuthenticated ? (
+          <>
+             {isVendor && (
+                 <Link to="/vendor-dashboard" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">Dashboard</Link>
+             )}
+             <button onClick={handleLogout} className="px-5 py-2 bg-gray-800 text-white text-sm font-bold rounded-xl hover:bg-gray-700 transition-colors">Log Out</button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">Log In</Link>
+            <Link to="/register" className="px-5 py-2 bg-emerald-500 text-white text-sm font-bold rounded-xl hover:bg-emerald-400 transition-colors">Sign Up</Link>
+          </>
+        )}
       </div>
+    </nav>
+  );
+}
 
-      {currentView === 'explore' && <ExploreHub initialVenues={mockVenues} />}
-      {currentView === 'vendor' && <VendorProfile />}
-      {currentView === 'checkout' && <Checkout />}
-    </div>
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<ExploreHub initialVenues={mockVenues} />} />
+            <Route path="/vendor/:id" element={<VendorProfile />} />
+            <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
