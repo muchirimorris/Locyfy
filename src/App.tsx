@@ -1,29 +1,137 @@
-import { VenueCard } from './components/venue/VenueCard';
+import { ExploreHub } from './components/venue/ExploreHub';
 import type { Venue } from './types/venue';
 
-const mockVenue: Venue = {
-  id: 'v1',
-  name: 'Karura Forest Event Grounds',
-  imageUrl: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
-  location: {
-    address: 'Limuru Road',
-    county: 'Nairobi',
-    estate: 'Gigiri',
-    landmark: 'Near the Main Gate'
+const mockVenues: Venue[] = [
+  {
+    id: 'v1',
+    name: 'Karura Forest Event Grounds',
+    imageUrl: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc1',
+      name: 'Main Gate Grounds',
+      subCounty: 'Gigiri',
+      county: 'Nairobi',
+      idealFor: ['Weddings', 'Corporate', 'Photo Shoots'],
+      terrain: 'Forest',
+    },
+    pricePerDay: 150000,
+    capacity: 300,
+    isLocyfyVerified: true,
+    mlRecommendationScore: 96,
+    amenities: ['Ample parking', 'Backup Generator/Inverter', 'Security Guards'],
   },
-  pricePerHour: 15000,
-  capacity: 300,
-  isVerified: true,
-  mlRecommendationScore: 94,
-  tags: ['Outdoor', 'Ruracio', 'Corporate', 'Nyama Choma']
-};
+  {
+    id: 'v2',
+    name: 'Windsor Golf Hotel Gardens',
+    imageUrl: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc2',
+      name: 'Kigwa View',
+      subCounty: 'Ridgeways',
+      county: 'Kiambu',
+      idealFor: ['Weddings', 'Corporate'],
+      terrain: 'Manicured Gardens',
+    },
+    pricePerDay: 250000,
+    capacity: 500,
+    isLocyfyVerified: true,
+    mlRecommendationScore: 89,
+    amenities: ['In-house catering', 'Ample parking', 'Backup Generator/Inverter'],
+  },
+  {
+    id: 'v3',
+    name: 'The Sarit Expo Centre',
+    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc3',
+      name: 'Cherangani Hall',
+      subCounty: 'Westlands',
+      county: 'Nairobi',
+      idealFor: ['Corporate', 'Concerts'],
+      terrain: 'Indoor Hall',
+    },
+    pricePerDay: 400000,
+    capacity: 2000,
+    isLocyfyVerified: true,
+    mlRecommendationScore: 78,
+    amenities: ['In-house catering', 'Ample parking', 'Backup Generator/Inverter', 'Air Conditioning'],
+  },
+  {
+    id: 'v4',
+    name: 'PrideInn Paradise Rooftop',
+    imageUrl: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc4',
+      name: 'Ocean View Terrace',
+      subCounty: 'Shanzu',
+      county: 'Mombasa',
+      idealFor: ['Weddings', 'Photo Shoots'],
+      terrain: 'Rooftop',
+    },
+    pricePerDay: 180000,
+    capacity: 150,
+    isLocyfyVerified: true,
+    mlRecommendationScore: 92,
+    amenities: ['In-house catering', 'Ample parking', 'Backup Generator/Inverter', 'Ocean View'],
+  },
+  {
+    id: 'v5',
+    name: 'Naivasha Sopa Lodge Grounds',
+    imageUrl: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc5',
+      name: 'Lakeside Lawns',
+      subCounty: 'Naivasha',
+      county: 'Nakuru',
+      idealFor: ['Weddings', 'Corporate'],
+      terrain: 'Lakeside',
+    },
+    pricePerDay: 300000,
+    capacity: 800,
+    isLocyfyVerified: true,
+    mlRecommendationScore: 84,
+    amenities: ['In-house catering', 'Ample parking', 'Backup Generator/Inverter', 'Boat Rides'],
+  },
+  {
+    id: 'v6',
+    name: 'The Alchemist Bar & Events',
+    imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc6',
+      name: 'Main Arena',
+      subCounty: 'Westlands',
+      county: 'Nairobi',
+      idealFor: ['Concerts', 'Corporate'],
+      terrain: 'Indoor Hall',
+    },
+    pricePerDay: 200000,
+    capacity: 1200,
+    isLocyfyVerified: false,
+    mlRecommendationScore: 65,
+    amenities: ['Ample parking', 'Backup Generator/Inverter', 'Food Trucks'],
+  },
+  {
+    id: 'v7',
+    name: 'Nyari Private Estate Grounds',
+    imageUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800',
+    eventLocation: {
+      id: 'loc7',
+      name: 'Backyard Gardens',
+      subCounty: 'Nyari',
+      county: 'Nairobi',
+      idealFor: ['Chama Meetings', 'Photo Shoots'],
+      terrain: 'Manicured Gardens',
+    },
+    pricePerDay: 25000,
+    capacity: 30,
+    isLocyfyVerified: true,
+    mlRecommendationScore: 98,
+    amenities: ['Chama-friendly pricing', 'Ample parking', 'Self-catering allowed'],
+  }
+];
 
 function App() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-      <VenueCard venue={mockVenue} onClick={(id) => console.log('Clicked', id)} />
-    </div>
-  );
+  return <ExploreHub initialVenues={mockVenues} />;
 }
 
 export default App;

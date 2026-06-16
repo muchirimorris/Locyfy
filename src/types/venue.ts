@@ -1,21 +1,30 @@
-export interface Location {
-  address: string; // Could be road or street
-  county: string;  // e.g., Nairobi, Kiambu, Mombasa
-  estate?: string; // e.g., Kilimani, Westlands, Nyali
-  landmark?: string; // Crucial in Kenya (e.g., 'Opposite Sarit Centre')
+export interface EventLocation {
+  id: string;
+  name: string;
+  subCounty: string;
+  county: 'Nairobi' | 'Nyeri' | 'Kiambu' | 'Nakuru' | 'Mombasa';
+  idealFor: ('Weddings' | 'Corporate' | 'Concerts' | 'Photo Shoots' | 'Chama Meetings')[];
+  terrain: 'Manicured Gardens' | 'Indoor Hall' | 'Rooftop' | 'Lakeside' | 'Forest';
 }
+
+export type Amenity = 
+  | 'In-house catering' 
+  | 'Ample parking' 
+  | 'Backup Generator/Inverter' 
+  | 'Chama-friendly pricing' 
+  | string;
 
 export interface Venue {
   id: string;
   name: string;
   description?: string;
   imageUrl: string;
-  location: Location;
-  pricePerHour: number;
+  eventLocation: EventLocation;
+  pricePerDay: number; // KES
   capacity: number;
-  isVerified: boolean;
+  isLocyfyVerified: boolean;
   mlRecommendationScore?: number; // Represented as a percentage (0-100)
-  tags?: string[];
+  amenities: Amenity[];
 }
 
 export interface VenueCardProps {
