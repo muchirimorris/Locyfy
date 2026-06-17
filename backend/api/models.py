@@ -64,6 +64,22 @@ class Venue(models.Model):
     def __str__(self):
         return self.name
 
+class VenueImage(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="images")
+    image_url = models.URLField(max_length=500)
+
+    def __str__(self):
+        return f"Image for {self.venue.name}"
+
+class VenuePackage(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="packages")
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    features = models.JSONField(default=list)
+
+    def __str__(self):
+        return f"{self.name} - {self.venue.name}"
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),

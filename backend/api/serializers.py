@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Venue, EventLocation, Amenity, EventCategory, Booking, Transaction
+from .models import Venue, EventLocation, Amenity, EventCategory, Booking, Transaction, VenueImage, VenuePackage
 
 class EventLocationSerializer(serializers.ModelSerializer):
     # Flatten the M2M IdealFor categories into a list of strings
@@ -13,6 +13,16 @@ class EventLocationSerializer(serializers.ModelSerializer):
         model = EventLocation
         fields = ['id', 'name', 'subCounty', 'county', 'idealFor', 'terrain']
 
+class VenueImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueImage
+        fields = ['id', 'image_url']
+
+class VenuePackageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenuePackage
+        fields = ['id', 'name', 'description', 'price', 'features']
+
 class VenueSerializer(serializers.ModelSerializer):
     # Nested EventLocation
     eventLocation = EventLocationSerializer(read_only=True)
@@ -22,6 +32,8 @@ class VenueSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
+    images = VenueImageSerializer(many=True, read_only=True)
+    packages = VenuePackageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Venue
@@ -35,7 +47,9 @@ class VenueSerializer(serializers.ModelSerializer):
             'capacity', 
             'isLocyfyVerified', 
             'mlRecommendationScore', 
-            'amenities'
+            'amenities',
+            'images',
+            'packages'
         ]
 
 class TransactionSerializer(serializers.ModelSerializer):

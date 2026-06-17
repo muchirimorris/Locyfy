@@ -14,6 +14,19 @@ export type Amenity =
   | 'Chama-friendly pricing' 
   | string;
 
+export interface VenueImage {
+  id: number;
+  image_url: string;
+}
+
+export interface VenuePackage {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  features: string[];
+}
+
 export interface Venue {
   id: string;
   name: string;
@@ -25,6 +38,8 @@ export interface Venue {
   isLocyfyVerified: boolean;
   mlRecommendationScore?: number; // Represented as a percentage (0-100)
   amenities: Amenity[];
+  images?: VenueImage[];
+  packages?: VenuePackage[];
 }
 
 export interface VenueCardProps {

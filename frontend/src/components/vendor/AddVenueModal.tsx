@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Image, MapPin, Loader2 } from 'lucide-react';
+import { X, Image as ImageIcon, MapPin, Loader2, Plus, Trash2 } from 'lucide-react';
 import apiClient from '../../services/apiClient';
 
 interface AddVenueModalProps {
@@ -23,6 +23,12 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
     terrain: 'Manicured Gardens',
   });
 
+  const [images, setImages] = useState<string[]>([]);
+  const [newImage, setNewImage] = useState('');
+
+  const [packages, setPackages] = useState<{name: string, description: string, price: string, features: string}[]>([]);
+  const [newPackage, setNewPackage] = useState({name: '', description: '', price: '', features: ''});
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +37,15 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
     setError(null);
 
     try {
-      await apiClient.post('/vendor/venues/', formData);
+      await apiClient.post('/vendor/venues/', {
+        ...formData,
+        images,
+        packages: packages.map(p => ({
+          ...p,
+          price: Number(p.price),
+          features: p.features.split(',').map(f => f.trim()).filter(f => f)
+        }))
+      });
       onSuccess();
     } catch (err: any) {
       console.error('Failed to create venue', err);
@@ -39,6 +53,28 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddImage = () => {
+    if (newImage && !images.includes(newImage)) {
+      setImages([...images, newImage]);
+      setNewImage('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleAddPackage = () => {
+    if (newPackage.name && newPackage.price) {
+      setPackages([...packages, newPackage]);
+      setNewPackage({name: '', description: '', price: '', features: ''});
+    }
+  };
+
+  const handleRemovePackage = (index: number) => {
+    setPackages(packages.filter((_, i) => i !== index));
   };
 
   return (
@@ -86,11 +122,11 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
               />
             </div>
 
-            {/* Image URL */}
+            {/* Primary Image URL */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">High-Res Image URL</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Primary High-Res Image URL</label>
               <div className="relative">
-                <Image className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
                   type="url" required
                   placeholder="https://images.unsplash.com/photo-..."
@@ -100,12 +136,39 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
               </div>
             </div>
 
+            {/* Gallery Images */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">Gallery Images (Optional)</h3>
+              <div className="flex gap-2">
+                <input 
+                  type="url"
+                  placeholder="Add another image URL"
+                  value={newImage} onChange={(e) => setNewImage(e.target.value)}
+                  className="flex-grow px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
+                />
+                <button type="button" onClick={handleAddImage} className="bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg font-bold hover:bg-emerald-200 transition-colors flex items-center gap-1">
+                  <Plus className="w-4 h-4" /> Add
+                </button>
+              </div>
+              {images.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {images.map((img, idx) => (
+                    <div key={idx} className="relative group rounded-lg overflow-hidden border border-gray-200 w-20 h-20">
+                      <img src={img} alt="Gallery" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => handleRemoveImage(idx)} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="w-5 h-5 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Details Row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Price Per Day (Ksh)</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Base Price Per Day (Ksh)</label>
                 <div className="relative">
-                   {/* We're in Kenya, so KES! */}
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Ksh</span>
                   <input 
                     type="number" required min="1000"
@@ -123,6 +186,39 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
                   value={formData.capacity} onChange={(e) => setFormData({...formData, capacity: e.target.value})}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
                 />
+              </div>
+            </div>
+
+            {/* Packages */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">Custom Packages (Optional)</h3>
+              
+              {packages.length > 0 && (
+                <div className="space-y-3 mb-4">
+                  {packages.map((pkg, idx) => (
+                    <div key={idx} className="bg-white p-3 border border-gray-200 rounded-lg flex justify-between items-center">
+                      <div>
+                        <p className="font-bold text-gray-900">{pkg.name} <span className="text-emerald-600 ml-2">Ksh {Number(pkg.price).toLocaleString()}</span></p>
+                        <p className="text-xs text-gray-500 mt-1">{pkg.description} | {pkg.features}</p>
+                      </div>
+                      <button type="button" onClick={() => handleRemovePackage(idx)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="bg-white p-3 rounded-lg border border-gray-200 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="text" placeholder="Package Name (e.g. VIP)" value={newPackage.name} onChange={e => setNewPackage({...newPackage, name: e.target.value})} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm" />
+                  <input type="number" placeholder="Price (Ksh)" value={newPackage.price} onChange={e => setNewPackage({...newPackage, price: e.target.value})} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm" />
+                </div>
+                <input type="text" placeholder="Short description" value={newPackage.description} onChange={e => setNewPackage({...newPackage, description: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm" />
+                <input type="text" placeholder="Features (comma separated)" value={newPackage.features} onChange={e => setNewPackage({...newPackage, features: e.target.value})} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm" />
+                <button type="button" onClick={handleAddPackage} className="w-full bg-emerald-100 text-emerald-700 py-2 rounded-lg font-bold text-sm hover:bg-emerald-200 transition-colors">
+                  + Add Package
+                </button>
               </div>
             </div>
 

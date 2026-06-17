@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, ShieldCheck, CheckCircle2, PlayCircle, MapPin, Check, Loader2 } from 'lucide-react';
+import { Star, ShieldCheck, CheckCircle2, PlayCircle, MapPin, Loader2 } from 'lucide-react';
 import apiClient from '../../services/apiClient';
 import type { Venue } from '../../types/venue';
 
@@ -27,10 +27,8 @@ export const VenueDetails: React.FC = () => {
     if (id) fetchVenue();
   }, [id]);
 
-  const handleBookNow = (packageType: string, priceMultiplier: number) => {
+  const handleBookNow = (packageType: string, calculatedPrice: number) => {
     if (!venue) return;
-    
-    const calculatedPrice = Number(venue.pricePerDay) * priceMultiplier;
     
     navigate('/checkout', {
       state: {
@@ -58,10 +56,7 @@ export const VenueDetails: React.FC = () => {
     );
   }
 
-  // Calculate pricing tiers mathematically for the MVP
   const basePrice = Number(venue.pricePerDay);
-  const korogaPrice = basePrice * 0.3; // 30% of base
-  const corporatePrice = basePrice * 1.5; // 150% of base
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -100,7 +95,14 @@ export const VenueDetails: React.FC = () => {
               <span className="text-sm font-bold text-gray-900">4.8 (124 Reviews)</span>
             </div>
             <button 
-              onClick={() => handleBookNow("Traditional / Ruracio Package", 1.0)}
+              onClick={() => {
+                // Default to first package or base price
+                if (venue.packages && venue.packages.length > 0) {
+                  handleBookNow(venue.packages[0].name, Number(venue.packages[0].price));
+                } else {
+                  handleBookNow("Base Package", basePrice);
+                }
+              }}
               className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors shadow-lg"
             >
               Book Now
@@ -143,13 +145,23 @@ export const VenueDetails: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Media Gallery</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="col-span-2 md:col-span-2 row-span-2 relative rounded-2xl overflow-hidden group cursor-pointer bg-gray-200">
-                  <img src={venue.imageUrl || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Event" />
+                  <img src={venue.imageUrl || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Event Primary" />
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                      <PlayCircle className="w-12 h-12 text-white" />
                   </div>
                 </div>
-                <div className="rounded-2xl overflow-hidden bg-gray-200"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e325?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover hover:scale-105 transition-transform" /></div>
-                <div className="rounded-2xl overflow-hidden bg-gray-200"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover hover:scale-105 transition-transform" /></div>
+                {venue.images && venue.images.length > 0 ? (
+                  venue.images.map((img) => (
+                    <div key={img.id} className="rounded-2xl overflow-hidden bg-gray-200">
+                      <img src={img.image_url} className="w-full h-full object-cover hover:scale-105 transition-transform" alt="Gallery item" />
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="rounded-2xl overflow-hidden bg-gray-200"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e325?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover hover:scale-105 transition-transform" alt="Placeholder 1" /></div>
+                    <div className="rounded-2xl overflow-hidden bg-gray-200"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover hover:scale-105 transition-transform" alt="Placeholder 2" /></div>
+                  </>
+                )}
               </div>
             </section>
 
@@ -175,70 +187,56 @@ export const VenueDetails: React.FC = () => {
           <aside className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Package Tiers</h2>
 
-            {/* Ruracio Package */}
-            <div className="bg-white rounded-3xl p-6 border-2 border-emerald-500 shadow-[0_8px_30px_rgba(16,185,129,0.1)] relative">
-              <div className="absolute top-0 right-6 -translate-y-1/2 bg-emerald-500 text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full">
-                Most Popular
+            {venue.packages && venue.packages.length > 0 ? (
+              venue.packages.map((pkg, index) => (
+                <div key={pkg.id} className={`bg-white rounded-3xl p-6 border shadow-sm relative ${index === 0 ? 'border-emerald-500 shadow-[0_8px_30px_rgba(16,185,129,0.1)]' : 'border-gray-100'}`}>
+                  {index === 0 && (
+                    <div className="absolute top-0 right-6 -translate-y-1/2 bg-emerald-500 text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full">
+                      Most Popular
+                    </div>
+                  )}
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{pkg.name}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{pkg.description}</p>
+                  <div className="mb-6">
+                    <span className="text-3xl font-black text-gray-900">Ksh {Number(pkg.price).toLocaleString()}</span>
+                    <span className="text-sm text-gray-500 font-medium"> / day</span>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {pkg.features.map((feature, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> {feature}</li>
+                    ))}
+                  </ul>
+                  <button 
+                    onClick={() => handleBookNow(pkg.name, Number(pkg.price))}
+                    className={`w-full py-3 font-bold rounded-xl transition-colors ${index === 0 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    Select Package
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="bg-white rounded-3xl p-6 border-2 border-emerald-500 shadow-[0_8px_30px_rgba(16,185,129,0.1)] relative">
+                <div className="absolute top-0 right-6 -translate-y-1/2 bg-emerald-500 text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full">
+                  Base Booking
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Standard Venue Hire</h3>
+                <p className="text-sm text-gray-500 mb-4">Dry hire of the venue grounds.</p>
+                <div className="mb-6">
+                  <span className="text-3xl font-black text-gray-900">Ksh {basePrice.toLocaleString()}</span>
+                  <span className="text-sm text-gray-500 font-medium"> / day</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Access to grounds</li>
+                  <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Standard amenities</li>
+                </ul>
+                <button 
+                  onClick={() => handleBookNow("Base Package", basePrice)}
+                  className="w-full py-3 bg-emerald-50 text-emerald-700 font-bold rounded-xl hover:bg-emerald-100 transition-colors"
+                >
+                  Select Package
+                </button>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Traditional / Ruracio</h3>
-              <p className="text-sm text-gray-500 mb-4">Perfect for large family gatherings.</p>
-              <div className="mb-6">
-                <span className="text-3xl font-black text-gray-900">Ksh {basePrice.toLocaleString()}</span>
-                <span className="text-sm text-gray-500 font-medium"> / day</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Large grounds (up to {venue.capacity} pax)</li>
-                <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> 2 VIP Holding Tents</li>
-                <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Local Decor inclusive</li>
-              </ul>
-              <button 
-                onClick={() => handleBookNow("Traditional / Ruracio Package", 1.0)}
-                className="w-full py-3 bg-emerald-50 text-emerald-700 font-bold rounded-xl hover:bg-emerald-100 transition-colors"
-              >
-                Select Package
-              </button>
-            </div>
-
-            {/* Corporate Package */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Corporate AGM</h3>
-              <p className="text-sm text-gray-500 mb-4">Streamlined for professional events.</p>
-              <div className="mb-6">
-                <span className="text-3xl font-black text-gray-900">Ksh {corporatePrice.toLocaleString()}</span>
-                <span className="text-sm text-gray-500 font-medium"> / day</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2 text-sm text-gray-600"><Check className="w-5 h-5 text-gray-400 shrink-0" /> PA System & Projectors</li>
-                <li className="flex items-start gap-2 text-sm text-gray-600"><Check className="w-5 h-5 text-gray-400 shrink-0" /> High-speed WiFi</li>
-                <li className="flex items-start gap-2 text-sm text-gray-600"><Check className="w-5 h-5 text-gray-400 shrink-0" /> Coffee/Tea breaks included</li>
-              </ul>
-              <button 
-                onClick={() => handleBookNow("Corporate AGM", 1.5)}
-                className="w-full py-3 bg-gray-50 text-gray-700 font-bold rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                Select Package
-              </button>
-            </div>
-
-            {/* Koroga Package */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Intimate Koroga</h3>
-              <p className="text-sm text-gray-500 mb-4">Self-catering options.</p>
-              <div className="mb-6">
-                <span className="text-3xl font-black text-gray-900">Ksh {korogaPrice.toLocaleString()}</span>
-                <span className="text-sm text-gray-500 font-medium"> / day</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2 text-sm text-gray-600"><Check className="w-5 h-5 text-gray-400 shrink-0" /> Grills & Jikos provided</li>
-                <li className="flex items-start gap-2 text-sm text-gray-600"><Check className="w-5 h-5 text-gray-400 shrink-0" /> Seating for 30 pax</li>
-              </ul>
-              <button 
-                onClick={() => handleBookNow("Intimate Koroga", 0.3)}
-                className="w-full py-3 bg-gray-50 text-gray-700 font-bold rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                Select Package
-              </button>
-            </div>
+            )}
 
           </aside>
         </div>

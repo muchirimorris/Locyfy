@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Sum
-from .models import Venue, EventLocation, Booking, Transaction, UserProfile
+from .models import Venue, EventLocation, Booking, Transaction, UserProfile, VenueImage, VenuePackage
 from .serializers import VenueSerializer, EventLocationSerializer, BookingSerializer
 from .permissions import IsVendor
 import time
@@ -174,6 +174,23 @@ class VendorVenueCreateView(APIView):
             capacity=capacity,
             isLocyfyVerified=False
         )
+
+        # 3. Create Images
+        images = request.data.get('images', [])
+        for img_url in images:
+            if img_url:
+                VenueImage.objects.create(venue=venue, image_url=img_url)
+
+        # 4. Create Packages
+        packages = request.data.get('packages', [])
+        for pkg in packages:
+            VenuePackage.objects.create(
+                venue=venue,
+                name=pkg.get('name'),
+                description=pkg.get('description', ''),
+                price=pkg.get('price', 0),
+                features=pkg.get('features', [])
+            )
 
         serializer = VenueSerializer(venue)
         return Response({
