@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import VenueViewSet, EventLocationViewSet, SignupView, ProcessPaymentView, VendorDashboardView, VendorBookingsView, VendorVenueCreateView, CurrentUserView
+from .views import VenueViewSet, EventLocationViewSet, SignupView, ProcessPaymentView, VendorDashboardView, VendorBookingsView, VendorVenueCreateView, CurrentUserView, CustomerBookingsView
 
 router = DefaultRouter()
 router.register(r'venues', VenueViewSet)
@@ -14,4 +14,5 @@ urlpatterns = [
     path('vendor/dashboard/', VendorDashboardView.as_view(), name='vendor_dashboard'),
     path('vendor/bookings/', VendorBookingsView.as_view(), name='vendor_bookings'),
     path('vendor/venues/', VendorVenueCreateView.as_view(), name='vendor_venues_create'),
+    path('customer/bookings/', CustomerBookingsView.as_view(), name='customer_bookings'),
 ]

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react
 import { ExploreHub } from './components/venue/ExploreHub';
 import { VenueDetails } from './components/venue/VenueDetails';
 import { VendorDashboard } from './components/vendor/VendorDashboard';
+import { CustomerDashboard } from './components/customer/CustomerDashboard';
 import { Checkout } from './components/booking/Checkout';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
@@ -50,8 +51,10 @@ function Navigation() {
       <div className="flex gap-4 items-center">
         {isAuthenticated ? (
           <>
-             {isVendor && (
+             {isVendor ? (
                  <Link to="/vendor-dashboard" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">Dashboard</Link>
+             ) : (
+                 <Link to="/dashboard" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">My Bookings</Link>
              )}
              <button onClick={handleLogout} className="px-5 py-2 bg-gray-800 text-white text-sm font-bold rounded-xl hover:bg-gray-700 transition-colors">Log Out</button>
           </>
@@ -77,6 +80,7 @@ function App() {
             <Route path="/" element={<ExploreHub initialVenues={mockVenues} />} />
             <Route path="/venue/:id" element={<VenueDetails />} />
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+            <Route path="/dashboard" element={<CustomerDashboard />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

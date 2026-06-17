@@ -181,4 +181,10 @@ class VendorVenueCreateView(APIView):
             'venue': serializer.data
         }, status=status.HTTP_201_CREATED)
 
+class CustomerBookingsView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data)
