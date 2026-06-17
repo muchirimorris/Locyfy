@@ -24,8 +24,7 @@ class VenuePackageSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'price', 'features']
 
 class VenueSerializer(serializers.ModelSerializer):
-    # Nested EventLocation
-    eventLocation = EventLocationSerializer(read_only=True)
+    locations = EventLocationSerializer(many=True, read_only=True)
     # Flatten Amenities into a list of strings
     amenities = serializers.SlugRelatedField(
         many=True,
@@ -42,7 +41,7 @@ class VenueSerializer(serializers.ModelSerializer):
             'name', 
             'description', 
             'imageUrl', 
-            'eventLocation', 
+            'locations', 
             'pricePerDay', 
             'capacity', 
             'isLocyfyVerified', 

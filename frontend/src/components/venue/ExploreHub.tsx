@@ -47,11 +47,13 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
 
   const filteredVenues = useMemo(() => {
     return venues.filter(venue => {
-      const matchesSearch = venue.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            venue.eventLocation?.subCounty.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCounty = selectedCounty === 'All' || venue.eventLocation?.county === selectedCounty;
-      const matchesTerrain = selectedTerrain === 'All' || venue.eventLocation?.terrain === selectedTerrain;
-      const matchesIdeal = selectedIdealFor === 'All' || venue.eventLocation?.idealFor?.includes(selectedIdealFor as any);
+      const matchesSearch = !searchQuery || 
+                            venue.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            venue.locations?.some(loc => loc.subCounty.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesCounty = selectedCounty === 'All' || venue.locations?.some(loc => loc.county === selectedCounty);
+      const matchesTerrain = selectedTerrain === 'All' || venue.locations?.some(loc => loc.terrain === selectedTerrain);
+      const matchesIdeal = selectedIdealFor === 'All' || venue.locations?.some(loc => loc.idealFor?.includes(selectedIdealFor as any));
 
       return matchesSearch && matchesCounty && matchesTerrain && matchesIdeal;
     });

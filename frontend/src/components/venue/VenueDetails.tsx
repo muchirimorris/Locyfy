@@ -11,6 +11,7 @@ export const VenueDetails: React.FC = () => {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("");
 
   useEffect(() => {
     const fetchVenue = async () => {
@@ -27,12 +28,23 @@ export const VenueDetails: React.FC = () => {
     if (id) fetchVenue();
   }, [id]);
 
+  useEffect(() => {
+    if (venue?.locations && venue.locations.length > 0) {
+      setSelectedLocationId(venue.locations[0].id);
+    }
+  }, [venue]);
+
   const handleBookNow = (packageType: string, calculatedPrice: number) => {
     if (!venue) return;
+    if (!selectedLocationId) {
+      alert("Please select a branch location.");
+      return;
+    }
     
     navigate('/checkout', {
       state: {
         venueId: venue.id,
+        locationId: selectedLocationId,
         venueName: venue.name,
         totalAmount: calculatedPrice,
         packageType: packageType
@@ -77,10 +89,25 @@ export const VenueDetails: React.FC = () => {
               <h1 className="text-3xl font-extrabold text-gray-900">{venue.name}</h1>
               {venue.isLocyfyVerified && <ShieldCheck className="w-6 h-6 text-emerald-500" />}
             </div>
-            <p className="text-gray-500 flex items-center gap-2 font-medium">
-              <MapPin className="w-4 h-4 text-gray-400" />
-              {venue.eventLocation?.subCounty}, {venue.eventLocation?.county}
-            </p>
+            
+            {venue.locations && venue.locations.length > 0 ? (
+              <div className="flex items-center gap-2 mt-2">
+                <MapPin className="w-5 h-5 text-gray-400" />
+                <select 
+                  value={selectedLocationId} 
+                  onChange={(e) => setSelectedLocationId(e.target.value)}
+                  className="bg-gray-50 border border-gray-200 text-gray-700 py-1.5 px-3 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-sm"
+                >
+                  {venue.locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.subCounty}, {loc.county} ({loc.terrain})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+               <p className="text-red-500 font-bold text-sm">No locations available.</p>
+            )}
           </div>
           
           <div className="flex items-center gap-6">

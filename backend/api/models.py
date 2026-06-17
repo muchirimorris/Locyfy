@@ -40,6 +40,7 @@ class EventLocation(models.Model):
         ('Forest', 'Forest'),
     ]
 
+    venue = models.ForeignKey('Venue', on_delete=models.CASCADE, related_name="locations", null=True, blank=True)
     name = models.CharField(max_length=200)
     subCounty = models.CharField(max_length=100)
     county = models.CharField(max_length=100, choices=COUNTY_CHOICES)
@@ -54,7 +55,6 @@ class Venue(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     imageUrl = models.URLField(max_length=500)
-    eventLocation = models.ForeignKey(EventLocation, on_delete=models.CASCADE, related_name="venues")
     pricePerDay = models.DecimalField(max_digits=12, decimal_places=2)
     capacity = models.PositiveIntegerField()
     isLocyfyVerified = models.BooleanField(default=False)
@@ -89,6 +89,7 @@ class Booking(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings")
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="bookings")
+    location = models.ForeignKey(EventLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings")
     booking_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)

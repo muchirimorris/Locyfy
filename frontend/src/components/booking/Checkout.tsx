@@ -37,8 +37,9 @@ export const Checkout: React.FC = () => {
 
     try {
       // 1. Hit our Process Payment Endpoint
-      const response = await apiClient.post('/bookings/process_payment/', {
-        venue_id: venueId,
+      const response = await apiClient.post('/bookings/process-payment/', {
+        venue_id: location.state?.venueId,
+        location_id: location.state?.locationId,
         booking_date: date,
         total_amount: totalAmount,
         phone_number: phoneNumber

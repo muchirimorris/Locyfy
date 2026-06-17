@@ -68,11 +68,12 @@ class ProcessPaymentView(APIView):
 
     def post(self, request):
         venue_id = request.data.get('venue_id')
+        location_id = request.data.get('location_id')
         booking_date = request.data.get('booking_date')
         total_amount = request.data.get('total_amount')
         payment_method = request.data.get('payment_method', 'M-PESA')
 
-        if not all([venue_id, booking_date, total_amount]):
+        if not all([venue_id, location_id, booking_date, total_amount]):
             return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -84,6 +85,7 @@ class ProcessPaymentView(APIView):
         booking = Booking.objects.create(
             user=request.user,
             venue=venue,
+            location_id=location_id,
             booking_date=booking_date,
             status='Confirmed',
             total_amount=total_amount
@@ -147,33 +149,31 @@ class VendorVenueCreateView(APIView):
         capacity = request.data.get('capacity')
         
         # EventLocation data
-        county = request.data.get('county')
-        subCounty = request.data.get('subCounty')
-        terrain = request.data.get('terrain')
+        locations_data = request.data.get('locations', [])
 
-        if not all([name, imageUrl, pricePerDay, capacity, county, subCounty, terrain]):
-            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([name, imageUrl, pricePerDay, capacity]) or not locations_data:
+            return Response({'error': 'Missing required fields or locations'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 1. Get or create the EventLocation
-        location_name = f"{subCounty} Grounds" # Arbitrary default name for location
-        event_location, created = EventLocation.objects.get_or_create(
-            county=county,
-            subCounty=subCounty,
-            terrain=terrain,
-            defaults={'name': location_name}
-        )
-
-        # 2. Create the Venue
+        # 1. Create the Venue
         venue = Venue.objects.create(
             vendor=request.user,
             name=name,
             description=description,
             imageUrl=imageUrl,
-            eventLocation=event_location,
             pricePerDay=pricePerDay,
             capacity=capacity,
             isLocyfyVerified=False
         )
+
+        # 2. Create EventLocations
+        for loc in locations_data:
+            EventLocation.objects.create(
+                venue=venue,
+                county=loc.get('county'),
+                subCounty=loc.get('subCounty'),
+                terrain=loc.get('terrain'),
+                name=f"{loc.get('subCounty')} Branch"
+            )
 
         # 3. Create Images
         images = request.data.get('images', [])

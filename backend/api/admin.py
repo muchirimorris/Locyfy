@@ -16,6 +16,6 @@ class EventLocationAdmin(admin.ModelAdmin):
 
 @admin.register(Venue)
 class VenueAdmin(admin.ModelAdmin):
-    list_display = ('name', 'eventLocation', 'pricePerDay', 'capacity', 'isLocyfyVerified')
+    list_display = ('name', 'pricePerDay', 'capacity', 'isLocyfyVerified')
     list_filter = ('isLocyfyVerified',)
     search_fields = ('name', 'description')

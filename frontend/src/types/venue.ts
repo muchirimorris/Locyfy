@@ -32,7 +32,7 @@ export interface Venue {
   name: string;
   description?: string;
   imageUrl: string;
-  eventLocation: EventLocation;
+  locations?: EventLocation[];
   pricePerDay: number; // KES
   capacity: number;
   isLocyfyVerified: boolean;

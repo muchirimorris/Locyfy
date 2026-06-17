@@ -18,10 +18,10 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
     imageUrl: '',
     pricePerDay: '',
     capacity: '',
-    county: 'Nairobi',
-    subCounty: '',
-    terrain: 'Manicured Gardens',
   });
+
+  const [locations, setLocations] = useState<{county: string, subCounty: string, terrain: string}[]>([]);
+  const [newLocation, setNewLocation] = useState({county: 'Nairobi', subCounty: '', terrain: 'Manicured Gardens'});
 
   const [images, setImages] = useState<string[]>([]);
   const [newImage, setNewImage] = useState('');
@@ -33,12 +33,18 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (locations.length === 0) {
+      setError("Please add at least one location branch.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
       await apiClient.post('/vendor/venues/', {
         ...formData,
+        locations,
         images,
         packages: packages.map(p => ({
           ...p,
@@ -53,6 +59,17 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddLocation = () => {
+    if (newLocation.subCounty) {
+      setLocations([...locations, newLocation]);
+      setNewLocation({county: 'Nairobi', subCounty: '', terrain: 'Manicured Gardens'});
+    }
+  };
+
+  const handleRemoveLocation = (index: number) => {
+    setLocations(locations.filter((_, i) => i !== index));
   };
 
   const handleAddImage = () => {
@@ -83,7 +100,7 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="text-xl font-extrabold text-gray-900">Add New Venue</h2>
+          <h2 className="text-xl font-extrabold text-gray-900">Add New Venue Brand</h2>
           <button 
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -103,10 +120,10 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
             
             {/* Name & Desc */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Venue Name</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Venue Brand Name</label>
               <input 
                 type="text" required
-                placeholder="e.g. Karura Forest Event Grounds"
+                placeholder="e.g. Safari Park Hotels"
                 value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
               />
@@ -116,7 +133,7 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
               <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
               <textarea 
                 rows={3} required
-                placeholder="Describe your beautiful venue..."
+                placeholder="Describe your beautiful venue brand..."
                 value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900 resize-none"
               />
@@ -133,6 +150,68 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
                   value={formData.imageUrl} onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-medium text-gray-900"
                 />
+              </div>
+            </div>
+
+            {/* Branches / Locations Row */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2"><MapPin className="w-4 h-4 text-emerald-600"/> Branches / Locations</h3>
+              
+              {locations.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {locations.map((loc, idx) => (
+                    <div key={idx} className="bg-white p-3 border border-gray-200 rounded-lg flex justify-between items-center">
+                      <p className="font-bold text-gray-900 text-sm">
+                        {loc.subCounty}, {loc.county} <span className="text-gray-500 font-normal ml-1">({loc.terrain})</span>
+                      </p>
+                      <button type="button" onClick={() => handleRemoveLocation(idx)} className="text-red-500 hover:bg-red-50 p-1 rounded-lg">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="bg-white p-3 rounded-lg border border-gray-200 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">County</label>
+                    <select 
+                      value={newLocation.county} onChange={(e) => setNewLocation({...newLocation, county: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm"
+                    >
+                      <option value="Nairobi">Nairobi</option>
+                      <option value="Nyeri">Nyeri</option>
+                      <option value="Kiambu">Kiambu</option>
+                      <option value="Nakuru">Nakuru</option>
+                      <option value="Mombasa">Mombasa</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Sub-County / Area</label>
+                    <input 
+                      type="text" placeholder="e.g. Gigiri"
+                      value={newLocation.subCounty} onChange={(e) => setNewLocation({...newLocation, subCounty: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Terrain Setup</label>
+                    <select 
+                      value={newLocation.terrain} onChange={(e) => setNewLocation({...newLocation, terrain: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm"
+                    >
+                      <option value="Manicured Gardens">Manicured Gardens</option>
+                      <option value="Indoor Hall">Indoor Hall</option>
+                      <option value="Rooftop">Rooftop</option>
+                      <option value="Lakeside">Lakeside</option>
+                      <option value="Forest">Forest</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="button" onClick={handleAddLocation} className="w-full bg-emerald-100 text-emerald-700 py-2 rounded-lg font-bold text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center gap-1">
+                  <Plus className="w-4 h-4" /> Add Branch
+                </button>
               </div>
             </div>
 
@@ -222,47 +301,6 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
               </div>
             </div>
 
-            {/* Location Row */}
-            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2"><MapPin className="w-4 h-4 text-emerald-600"/> Event Location Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">County</label>
-                  <select 
-                    value={formData.county} onChange={(e) => setFormData({...formData, county: e.target.value})}
-                    className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
-                  >
-                    <option value="Nairobi">Nairobi</option>
-                    <option value="Nyeri">Nyeri</option>
-                    <option value="Kiambu">Kiambu</option>
-                    <option value="Nakuru">Nakuru</option>
-                    <option value="Mombasa">Mombasa</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Sub-County / Area</label>
-                  <input 
-                    type="text" required placeholder="e.g. Gigiri"
-                    value={formData.subCounty} onChange={(e) => setFormData({...formData, subCounty: e.target.value})}
-                    className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Terrain Setup</label>
-                  <select 
-                    value={formData.terrain} onChange={(e) => setFormData({...formData, terrain: e.target.value})}
-                    className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg outline-none font-medium text-gray-900"
-                  >
-                    <option value="Manicured Gardens">Manicured Gardens</option>
-                    <option value="Indoor Hall">Indoor Hall</option>
-                    <option value="Rooftop">Rooftop</option>
-                    <option value="Lakeside">Lakeside</option>
-                    <option value="Forest">Forest</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
           </div>
 
           <div className="mt-8 flex justify-end gap-3">
@@ -278,7 +316,7 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
               disabled={loading}
               className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 shadow-lg"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Publish Venue'}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Publish Venue Brand'}
             </button>
           </div>
         </form>
