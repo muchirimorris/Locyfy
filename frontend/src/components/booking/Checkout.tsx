@@ -60,27 +60,30 @@ export const Checkout: React.FC = () => {
 
   if (step === 'success') {
       return (
-          <div className="min-h-screen bg-emerald-50 flex items-center justify-center p-6">
-              <div className="bg-white max-w-md w-full rounded-3xl p-10 text-center shadow-xl border border-emerald-100">
-                  <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 relative overflow-hidden">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+              
+              <div className="bg-white/80 backdrop-blur-xl max-w-md w-full rounded-[2rem] p-10 text-center shadow-[0_20px_40px_rgb(0,0,0,0.06)] border border-white/50 relative z-10">
+                  <div className="w-24 h-24 bg-emerald-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner relative">
+                      <div className="absolute inset-0 bg-emerald-400/20 blur-xl rounded-[2rem]"></div>
+                      <CheckCircle2 className="w-12 h-12 text-emerald-500 relative z-10" />
                   </div>
-                  <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Booking Confirmed!</h1>
-                  <p className="text-gray-500 font-medium mb-8">Your payment was securely verified and held in Escrow.</p>
+                  <h1 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">Booking Confirmed!</h1>
+                  <p className="text-gray-500 font-medium mb-10 text-lg">Your payment was securely verified and held in Escrow.</p>
                   
-                  <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left border border-gray-100">
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Transaction Ref</p>
-                      <p className="font-mono text-gray-900 font-bold mb-4">{bookingRef}</p>
+                  <div className="bg-white/60 rounded-3xl p-6 mb-10 text-left border border-gray-100 shadow-sm backdrop-blur-md">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">TRANSACTION REF</p>
+                      <p className="font-mono text-gray-900 font-bold mb-5 tracking-wide">{bookingRef}</p>
                       
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Venue</p>
-                      <p className="text-gray-900 font-bold mb-4">{venueName}</p>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">VENUE</p>
+                      <p className="text-gray-900 font-black mb-5 tracking-tight">{venueName}</p>
                       
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Amount Paid</p>
-                      <p className="text-emerald-600 font-black text-xl">Ksh {totalAmount.toLocaleString()}</p>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">AMOUNT PAID</p>
+                      <p className="text-emerald-500 font-black text-3xl tracking-tight">Ksh {totalAmount.toLocaleString()}</p>
                   </div>
 
-                  <Link to="/" className="w-full block py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-colors">
-                      Back to Dashboard
+                  <Link to="/" className="w-full block py-4 bg-gray-900 text-white font-black tracking-wide rounded-2xl hover:bg-emerald-500 transition-all shadow-lg hover:-translate-y-0.5">
+                      BACK TO DASHBOARD
                   </Link>
               </div>
           </div>
@@ -209,34 +212,35 @@ export const Checkout: React.FC = () => {
           </div>
 
           {/* Price Breakdown Sidebar */}
-          <aside>
-            <div className="bg-gray-900 rounded-3xl p-8 text-white sticky top-8 shadow-2xl">
-              <h2 className="text-xl font-bold mb-6">Booking Summary</h2>
+          <aside className="lg:sticky lg:top-8 h-fit">
+            <div className="bg-gray-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden border border-gray-800">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent mix-blend-overlay"></div>
+              <h2 className="text-2xl font-black mb-8 tracking-tight relative z-10">Booking Summary</h2>
               
-              <div className="mb-6">
-                <p className="text-gray-400 text-sm font-medium mb-1">Venue</p>
-                <p className="font-bold text-lg">{venueName}</p>
-                {date && <p className="text-gray-400 text-sm mt-1">{new Date(date).toLocaleDateString()} • Full Day</p>}
+              <div className="mb-8 relative z-10">
+                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2">VENUE</p>
+                <p className="font-black text-xl tracking-tight leading-tight">{venueName}</p>
+                {date && <p className="text-emerald-400 text-sm mt-2 font-bold">{new Date(date).toLocaleDateString()} • Full Day</p>}
               </div>
 
-              <div className="space-y-4 mb-6 pb-6 border-b border-gray-800">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300 font-medium">{packageType || 'Base Venue Booking'}</span>
-                  <span className="font-bold">Ksh {totalAmount.toLocaleString()}</span>
+              <div className="space-y-5 mb-8 pb-8 border-b border-gray-800 relative z-10">
+                <div className="flex justify-between items-end">
+                  <span className="text-gray-400 font-semibold text-sm max-w-[60%]">{packageType || 'Base Venue Booking'}</span>
+                  <span className="font-black text-lg">Ksh {totalAmount.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300 font-medium">Locyfy Escrow Fee (1.5%)</span>
-                  <span className="font-bold">Ksh {(totalAmount * 0.015).toLocaleString()}</span>
+                <div className="flex justify-between items-end">
+                  <span className="text-gray-400 font-semibold text-sm">Escrow Fee (1.5%)</span>
+                  <span className="font-black">Ksh {(totalAmount * 0.015).toLocaleString()}</span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mb-8">
-                <span className="text-gray-300 font-medium">Total Due Today</span>
-                <span className="text-2xl font-black text-emerald-400">Ksh {(totalAmount * 1.015).toLocaleString()}</span>
+              <div className="flex justify-between items-center mb-10 relative z-10">
+                <span className="text-gray-300 font-bold tracking-wide">Total Due Today</span>
+                <span className="text-3xl font-black text-emerald-400 tracking-tight">Ksh {(totalAmount * 1.015).toLocaleString()}</span>
               </div>
               
-              <p className="text-center text-xs text-gray-500 mt-4 font-medium flex items-center justify-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> Secure Encrypted Checkout
+              <p className="text-center text-[10px] text-gray-500 mt-4 font-black uppercase tracking-widest flex items-center justify-center gap-2 relative z-10 bg-black/20 py-2 rounded-full backdrop-blur-sm">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" /> SECURE ENCRYPTED CHECKOUT
               </p>
             </div>
           </aside>

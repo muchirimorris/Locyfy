@@ -45,27 +45,37 @@ function Navigation() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
-      <Link to="/" className="text-2xl font-extrabold text-emerald-400 tracking-tight">Locyfy.</Link>
-      
-      <div className="flex gap-4 items-center">
-        {isAuthenticated ? (
-          <>
-             {isVendor ? (
-                 <Link to="/vendor-dashboard" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">Dashboard</Link>
-             ) : (
-                 <Link to="/dashboard" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">My Bookings</Link>
-             )}
-             <button onClick={handleLogout} className="px-5 py-2 bg-gray-800 text-white text-sm font-bold rounded-xl hover:bg-gray-700 transition-colors">Log Out</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">Log In</Link>
-            <Link to="/register" className="px-5 py-2 bg-emerald-500 text-white text-sm font-bold rounded-xl hover:bg-emerald-400 transition-colors">Sign Up</Link>
-          </>
-        )}
-      </div>
-    </nav>
+    <div className="fixed w-full top-6 z-50 flex justify-center px-4 animate-fade-in-up">
+      <nav className="glass-dark text-white px-6 py-3.5 rounded-full flex justify-between items-center shadow-glow max-w-4xl w-full transition-all duration-300">
+        <Link to="/" className="text-2xl font-black text-emerald-400 tracking-tight hover:text-emerald-300 transition-colors">
+          Locyfy<span className="text-white">.</span>
+        </Link>
+        
+        <div className="flex gap-6 items-center">
+          {isAuthenticated ? (
+            <>
+               {isVendor ? (
+                   <Link to="/vendor-dashboard" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors relative group">
+                     Dashboard
+                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                   </Link>
+               ) : (
+                   <Link to="/dashboard" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors relative group">
+                     My Bookings
+                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                   </Link>
+               )}
+               <button onClick={handleLogout} className="px-5 py-2.5 bg-white/10 text-white text-sm font-bold rounded-full hover:bg-white/20 transition-colors border border-white/10 backdrop-blur-md">Log Out</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors">Log In</Link>
+              <Link to="/register" className="px-5 py-2.5 bg-emerald-500 text-white text-sm font-bold rounded-full hover:bg-emerald-400 transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.5)]">Sign Up</Link>
+            </>
+          )}
+        </div>
+      </nav>
+    </div>
   );
 }
 

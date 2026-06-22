@@ -73,22 +73,22 @@ export const VenueDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Cover Image & Header */}
-      <div className="relative h-72 md:h-96 w-full">
+      {/* Cover Image & Header - Parallax Effect */}
+      <div className="relative h-96 md:h-[32rem] w-full sticky top-0 -z-10">
         <img 
           src={venue.imageUrl || "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920"} 
           alt={venue.name} 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 -mt-24 relative z-10">
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 -mt-32 relative z-10">
+        <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/50 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-extrabold text-gray-900">{venue.name}</h1>
-              {venue.isLocyfyVerified && <ShieldCheck className="w-6 h-6 text-emerald-500" />}
+              <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">{venue.name}</h1>
+              {venue.isLocyfyVerified && <ShieldCheck className="w-8 h-8 text-emerald-500 drop-shadow-sm" />}
             </div>
             
             {venue.locations && venue.locations.length > 0 ? (
@@ -120,7 +120,7 @@ export const VenueDetails: React.FC = () => {
                 <Star className="w-5 h-5 fill-current" />
                 <Star className="w-5 h-5 fill-current text-gray-200" />
               </div>
-              <span className="text-sm font-bold text-gray-900">4.8 (124 Reviews)</span>
+              <span className="text-sm font-black text-gray-900 tracking-wider">4.8 (124 Reviews)</span>
             </div>
             <button 
               onClick={() => {
@@ -131,9 +131,9 @@ export const VenueDetails: React.FC = () => {
                   handleBookNow("Base Package", basePrice);
                 }
               }}
-              className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors shadow-lg"
+              className="px-8 py-4 bg-gray-900 text-white font-black tracking-wide rounded-2xl hover:bg-emerald-500 transition-all shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5"
             >
-              Book Now
+              BOOK NOW
             </button>
           </div>
         </div>
@@ -212,8 +212,8 @@ export const VenueDetails: React.FC = () => {
           </div>
 
           {/* Sidebar / Pricing Tiers (Right) */}
-          <aside className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Package Tiers</h2>
+          <aside className="space-y-6 lg:sticky lg:top-32 h-fit">
+            <h2 className="text-2xl font-black text-gray-900 mb-6 tracking-tight">Package Tiers</h2>
 
             {venue.packages && venue.packages.length > 0 ? (
               venue.packages.map((pkg, index) => (
@@ -223,22 +223,22 @@ export const VenueDetails: React.FC = () => {
                       Most Popular
                     </div>
                   )}
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{pkg.name}</h3>
-                  <p className="text-sm text-gray-500 mb-4">{pkg.description}</p>
+                  <h3 className="text-xl font-black text-gray-900 mb-1 tracking-tight">{pkg.name}</h3>
+                  <p className="text-sm text-gray-500 mb-4 font-medium">{pkg.description}</p>
                   <div className="mb-6">
-                    <span className="text-3xl font-black text-gray-900">Ksh {Number(pkg.price).toLocaleString()}</span>
-                    <span className="text-sm text-gray-500 font-medium"> / day</span>
+                    <span className="text-3xl font-black text-gray-900 tracking-tight">Ksh {Number(pkg.price).toLocaleString()}</span>
+                    <span className="text-xs text-gray-400 font-black uppercase tracking-widest"> / day</span>
                   </div>
                   <ul className="space-y-3 mb-8">
                     {pkg.features.map((feature, fIdx) => (
-                      <li key={fIdx} className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> {feature}</li>
+                      <li key={fIdx} className="flex items-start gap-3 text-sm text-gray-600 font-semibold"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> {feature}</li>
                     ))}
                   </ul>
                   <button 
                     onClick={() => handleBookNow(pkg.name, Number(pkg.price))}
-                    className={`w-full py-3 font-bold rounded-xl transition-colors ${index === 0 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
+                    className={`w-full py-4 font-black tracking-wide rounded-2xl transition-all hover:-translate-y-0.5 ${index === 0 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-sm' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
                   >
-                    Select Package
+                    SELECT PACKAGE
                   </button>
                 </div>
               ))
@@ -247,21 +247,21 @@ export const VenueDetails: React.FC = () => {
                 <div className="absolute top-0 right-6 -translate-y-1/2 bg-emerald-500 text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full">
                   Base Booking
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">Standard Venue Hire</h3>
-                <p className="text-sm text-gray-500 mb-4">Dry hire of the venue grounds.</p>
+                <h3 className="text-xl font-black text-gray-900 mb-1 tracking-tight">Standard Venue Hire</h3>
+                <p className="text-sm text-gray-500 mb-4 font-medium">Dry hire of the venue grounds.</p>
                 <div className="mb-6">
-                  <span className="text-3xl font-black text-gray-900">Ksh {basePrice.toLocaleString()}</span>
-                  <span className="text-sm text-gray-500 font-medium"> / day</span>
+                  <span className="text-3xl font-black text-gray-900 tracking-tight">Ksh {basePrice.toLocaleString()}</span>
+                  <span className="text-xs text-gray-400 font-black uppercase tracking-widest"> / day</span>
                 </div>
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Access to grounds</li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700 font-medium"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Standard amenities</li>
+                  <li className="flex items-start gap-3 text-sm text-gray-600 font-semibold"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Access to grounds</li>
+                  <li className="flex items-start gap-3 text-sm text-gray-600 font-semibold"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Standard amenities</li>
                 </ul>
                 <button 
                   onClick={() => handleBookNow("Base Package", basePrice)}
-                  className="w-full py-3 bg-emerald-50 text-emerald-700 font-bold rounded-xl hover:bg-emerald-100 transition-colors"
+                  className="w-full py-4 bg-emerald-50 text-emerald-700 font-black tracking-wide rounded-2xl hover:bg-emerald-100 transition-all hover:-translate-y-0.5 shadow-sm"
                 >
-                  Select Package
+                  SELECT PACKAGE
                 </button>
               </div>
             )}
