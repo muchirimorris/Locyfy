@@ -43,7 +43,7 @@ export const Login: React.FC = () => {
       } else {
         navigate('/');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Login error', err);
       setError('Invalid credentials. Please try again.');
     } finally {

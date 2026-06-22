@@ -5,6 +5,18 @@ import apiClient from '../../services/apiClient';
 import { Building2, CalendarCheck, DollarSign, Loader2, Star, TrendingUp } from 'lucide-react';
 import { AddVenueModal } from './AddVenueModal';
 
+interface Transaction {
+  payment_status?: string;
+}
+
+interface Booking {
+  id: string | number;
+  status: string;
+  total_amount: number | string;
+  booking_date: string;
+  transaction?: Transaction;
+}
+
 export const VendorDashboard: React.FC = () => {
   const { isAuthenticated, isVendor } = useAuthStore();
   const navigate = useNavigate();
@@ -15,7 +27,7 @@ export const VendorDashboard: React.FC = () => {
     upcoming_bookings: 0,
     total_venues: 0
   });
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -44,7 +56,10 @@ export const VendorDashboard: React.FC = () => {
       navigate('/');
       return;
     }
-    fetchDashboardData();
+    const init = async () => {
+      await fetchDashboardData();
+    };
+    void init();
   }, [isAuthenticated, isVendor, navigate, fetchDashboardData]);
 
   const handleVenueAdded = () => {
@@ -161,7 +176,7 @@ export const VendorDashboard: React.FC = () => {
                     <td colSpan={5} className="p-8 text-center text-gray-500 font-medium">No bookings found yet.</td>
                   </tr>
                 ) : (
-                  bookings.map((booking: any) => (
+                  bookings.map((booking: Booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4">
                         <span className="font-mono text-sm font-bold text-gray-900">#{booking.id}</span>

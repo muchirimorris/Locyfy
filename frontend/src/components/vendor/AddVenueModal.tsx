@@ -53,9 +53,9 @@ export const AddVenueModal: React.FC<AddVenueModalProps> = ({ isOpen, onClose, o
         }))
       });
       onSuccess();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to create venue', err);
-      setError(err.response?.data?.error || 'Failed to add venue. Please check your inputs.');
+      setError((err as { response?: { data?: { error?: string } } }).response?.data?.error || 'Failed to add venue. Please check your inputs.');
     } finally {
       setLoading(false);
     }

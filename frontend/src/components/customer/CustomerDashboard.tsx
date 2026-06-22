@@ -1,26 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import apiClient from '../../services/apiClient';
 import { CalendarCheck, DollarSign, Loader2, Star, Tent } from 'lucide-react';
 
+interface Transaction {
+  payment_status?: string;
+}
+
+interface Booking {
+  id: string | number;
+  status: string;
+  total_amount: number | string;
+  booking_date: string;
+  transaction?: Transaction;
+}
+
 export const CustomerDashboard: React.FC = () => {
   const { isAuthenticated, isVendor } = useAuthStore();
   const navigate = useNavigate();
 
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchBookings = useCallback(async () => {
-    try {
-      const bookingsRes = await apiClient.get('/customer/bookings/');
-      setBookings(bookingsRes.data);
-    } catch (error) {
-      console.error("Failed to fetch customer bookings", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -32,8 +33,19 @@ export const CustomerDashboard: React.FC = () => {
       navigate('/vendor-dashboard');
       return;
     }
-    fetchBookings();
-  }, [isAuthenticated, isVendor, navigate, fetchBookings]);
+    const fetchBookings = async () => {
+      try {
+        const bookingsRes = await apiClient.get('/customer/bookings/');
+        setBookings(bookingsRes.data);
+      } catch (error) {
+        console.error("Failed to fetch customer bookings", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchBookings();
+  }, [isAuthenticated, isVendor, navigate]);
 
   if (loading && bookings.length === 0) {
     return (
@@ -131,7 +143,7 @@ export const CustomerDashboard: React.FC = () => {
                     <td colSpan={5} className="p-8 text-center text-gray-500 font-medium">No bookings found yet. Go explore venues!</td>
                   </tr>
                 ) : (
-                  bookings.map((booking: any) => (
+                  bookings.map((booking: Booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4 flex items-center gap-3">
                         {booking.transaction && (

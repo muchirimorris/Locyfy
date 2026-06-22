@@ -52,9 +52,9 @@ export const Register: React.FC = () => {
       } else {
           navigate('/');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Registration error', err);
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      setError((err as { response?: { data?: { error?: string } } }).response?.data?.error || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

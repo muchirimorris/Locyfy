@@ -30,6 +30,7 @@ export const VenueDetails: React.FC = () => {
 
   useEffect(() => {
     if (venue?.locations && venue.locations.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedLocationId(venue.locations[0].id);
     }
   }, [venue]);
@@ -152,9 +153,9 @@ export const VenueDetails: React.FC = () => {
 
               <h3 className="text-lg font-bold text-gray-900 mb-4">Key Amenities</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                 {(venue.amenities && venue.amenities.length > 0) ? venue.amenities.map((amenity: any, idx) => (
+                 {(venue.amenities && venue.amenities.length > 0) ? venue.amenities.map((amenity: unknown, idx) => (
                     <div key={idx} className="flex items-center gap-2 text-gray-700 font-medium bg-gray-100 p-3 rounded-xl text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {typeof amenity === 'string' ? amenity : amenity.name}
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" /> {typeof amenity === 'string' ? amenity : (amenity as {name: string}).name}
                     </div>
                  )) : (
                     <div className="flex items-center gap-2 text-gray-700 font-medium bg-gray-100 p-3 rounded-xl text-sm">

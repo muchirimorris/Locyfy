@@ -53,7 +53,7 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
       
       const matchesCounty = selectedCounty === 'All' || venue.locations?.some(loc => loc.county === selectedCounty);
       const matchesTerrain = selectedTerrain === 'All' || venue.locations?.some(loc => loc.terrain === selectedTerrain);
-      const matchesIdeal = selectedIdealFor === 'All' || venue.locations?.some(loc => loc.idealFor?.includes(selectedIdealFor as any));
+      const matchesIdeal = selectedIdealFor === 'All' || venue.locations?.some(loc => loc.idealFor?.includes(selectedIdealFor as string));
 
       return matchesSearch && matchesCounty && matchesTerrain && matchesIdeal;
     });
