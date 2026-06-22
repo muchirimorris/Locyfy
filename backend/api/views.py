@@ -10,13 +10,16 @@ from .permissions import IsVendor
 import time
 import uuid
 
+
 class EventLocationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EventLocation.objects.all()
     serializer_class = EventLocationSerializer
 
+
 class VenueViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
@@ -30,10 +33,12 @@ class SignupView(APIView):
         role = request.data.get('role', 'user')
 
         if not email or not password:
-            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Email and password are required'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(username=email).exists():
-            return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'User already exists'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.create_user(
             username=email,
@@ -45,7 +50,9 @@ class SignupView(APIView):
 
         UserProfile.objects.create(user=user, role=role)
 
-        return Response({'success': 'User registered successfully'}, status=status.HTTP_201_CREATED)
+        return Response({'success': 'User registered successfully'},
+                        status=status.HTTP_201_CREATED)
+
 
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -54,7 +61,7 @@ class CurrentUserView(APIView):
         role = 'customer'
         if hasattr(request.user, 'profile'):
             role = request.user.profile.role
-            
+
         return Response({
             'username': request.user.username,
             'email': request.user.email,
@@ -62,6 +69,7 @@ class CurrentUserView(APIView):
             'last_name': request.user.last_name,
             'role': role
         })
+
 
 class ProcessPaymentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -74,12 +82,14 @@ class ProcessPaymentView(APIView):
         payment_method = request.data.get('payment_method', 'M-PESA')
 
         if not all([venue_id, location_id, booking_date, total_amount]):
-            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Missing required fields'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         try:
             venue = Venue.objects.get(id=venue_id)
         except Venue.DoesNotExist:
-            return Response({'error': 'Venue not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Venue not found'},
+                            status=status.HTTP_404_NOT_FOUND)
 
         # 1. Create Booking
         booking = Booking.objects.create(
@@ -91,11 +101,12 @@ class ProcessPaymentView(APIView):
             total_amount=total_amount
         )
 
-        # 2. Simulate M-PESA delay (we'll just do a brief sleep to mimic a real transaction)
+        # 2. Simulate M-PESA delay (we'll just do a brief sleep to mimic a real
+        # transaction)
         time.sleep(1.5)
 
         # 3. Create Transaction
-        transaction = Transaction.objects.create(
+        Transaction.objects.create(
             booking=booking,
             payment_method=payment_method,
             amount=total_amount,
@@ -109,6 +120,7 @@ class ProcessPaymentView(APIView):
             'booking': serializer.data
         }, status=status.HTTP_201_CREATED)
 
+
 class VendorDashboardView(APIView):
     permission_classes = [IsVendor]
 
@@ -117,8 +129,10 @@ class VendorDashboardView(APIView):
         vendor_venues = Venue.objects.filter(vendor=request.user)
         # Find bookings for these venues
         bookings = Booking.objects.filter(venue__in=vendor_venues)
-        
-        total_revenue = bookings.filter(status='Confirmed').aggregate(total=Sum('total_amount'))['total'] or 0
+
+        total_revenue = bookings.filter(
+            status='Confirmed').aggregate(
+            total=Sum('total_amount'))['total'] or 0
         pending_bookings = bookings.filter(status='Pending').count()
         upcoming_bookings = bookings.filter(status='Confirmed').count()
 
@@ -129,14 +143,17 @@ class VendorDashboardView(APIView):
             'total_venues': vendor_venues.count()
         })
 
+
 class VendorBookingsView(APIView):
     permission_classes = [IsVendor]
 
     def get(self, request):
         vendor_venues = Venue.objects.filter(vendor=request.user)
-        bookings = Booking.objects.filter(venue__in=vendor_venues).order_by('-created_at')
+        bookings = Booking.objects.filter(
+            venue__in=vendor_venues).order_by('-created_at')
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
+
 
 class VendorVenueCreateView(APIView):
     permission_classes = [IsVendor]
@@ -147,12 +164,14 @@ class VendorVenueCreateView(APIView):
         imageUrl = request.data.get('imageUrl')
         pricePerDay = request.data.get('pricePerDay')
         capacity = request.data.get('capacity')
-        
+
         # EventLocation data
         locations_data = request.data.get('locations', [])
 
-        if not all([name, imageUrl, pricePerDay, capacity]) or not locations_data:
-            return Response({'error': 'Missing required fields or locations'}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([name, imageUrl, pricePerDay, capacity]
+                   ) or not locations_data:
+            return Response({'error': 'Missing required fields or locations'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # 1. Create the Venue
         venue = Venue.objects.create(
@@ -198,10 +217,12 @@ class VendorVenueCreateView(APIView):
             'venue': serializer.data
         }, status=status.HTTP_201_CREATED)
 
+
 class CustomerBookingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
+        bookings = Booking.objects.filter(
+            user=request.user).order_by('-created_at')
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)

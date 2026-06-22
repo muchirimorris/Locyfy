@@ -16,6 +16,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='venue',
             name='vendor',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owned_venues', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='owned_venues',
+                to=settings.AUTH_USER_MODEL),
         ),
     ]

@@ -18,11 +18,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='booking',
             name='location',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='bookings', to='api.eventlocation'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='bookings',
+                to='api.eventlocation'),
         ),
         migrations.AddField(
             model_name='eventlocation',
             name='venue',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='locations', to='api.venue'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='locations',
+                to='api.venue'),
         ),
     ]

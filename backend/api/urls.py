@@ -7,12 +7,36 @@ router.register(r'venues', VenueViewSet)
 router.register(r'locations', EventLocationViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('signup/', SignupView.as_view(), name='signup'),
-    path('me/', CurrentUserView.as_view(), name='current_user'),
-    path('bookings/process_payment/', ProcessPaymentView.as_view(), name='process_payment'),
-    path('vendor/dashboard/', VendorDashboardView.as_view(), name='vendor_dashboard'),
-    path('vendor/bookings/', VendorBookingsView.as_view(), name='vendor_bookings'),
-    path('vendor/venues/', VendorVenueCreateView.as_view(), name='vendor_venues_create'),
-    path('customer/bookings/', CustomerBookingsView.as_view(), name='customer_bookings'),
+    path(
+        '',
+        include(
+            router.urls)),
+    path(
+        'signup/',
+        SignupView.as_view(),
+        name='signup'),
+    path(
+        'me/',
+        CurrentUserView.as_view(),
+        name='current_user'),
+    path(
+        'bookings/process_payment/',
+        ProcessPaymentView.as_view(),
+        name='process_payment'),
+    path(
+        'vendor/dashboard/',
+        VendorDashboardView.as_view(),
+        name='vendor_dashboard'),
+    path(
+        'vendor/bookings/',
+        VendorBookingsView.as_view(),
+        name='vendor_bookings'),
+    path(
+        'vendor/venues/',
+        VendorVenueCreateView.as_view(),
+        name='vendor_venues_create'),
+    path(
+        'customer/bookings/',
+        CustomerBookingsView.as_view(),
+        name='customer_bookings'),
 ]
