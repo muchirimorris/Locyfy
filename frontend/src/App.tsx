@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { LandingPage } from './pages/LandingPage';
 import { ExploreHub } from './components/venue/ExploreHub';
 import { VenueDetails } from './components/venue/VenueDetails';
 import { VendorDashboard } from './components/vendor/VendorDashboard';
@@ -87,7 +88,8 @@ function App() {
 
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<ExploreHub initialVenues={mockVenues} />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/explore" element={<ExploreHub initialVenues={mockVenues} />} />
             <Route path="/venue/:id" element={<VenueDetails />} />
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/dashboard" element={<CustomerDashboard />} />
