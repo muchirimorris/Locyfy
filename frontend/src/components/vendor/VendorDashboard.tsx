@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import apiClient from '../../services/apiClient';
 import { Building2, CalendarCheck, DollarSign, Loader2, Star, TrendingUp } from 'lucide-react';
 import { AddVenueModal } from './AddVenueModal';
+import { motion } from 'framer-motion';
 
 interface Transaction {
   payment_status?: string;
@@ -76,6 +77,19 @@ export const VendorDashboard: React.FC = () => {
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
       {/* Modal Overlay */}
@@ -91,18 +105,25 @@ export const VendorDashboard: React.FC = () => {
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
         
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between md:items-end relative z-10 gap-6">
-          <div className="animate-fade-in-up">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <h1 className="text-4xl font-black tracking-tight mb-2 drop-shadow-lg">Vendor Dashboard</h1>
             <p className="text-emerald-400 font-bold tracking-wide flex items-center gap-2 uppercase text-sm">
               <Building2 className="w-5 h-5" /> Locyfy Verified Partner
             </p>
-          </div>
-          <button 
+          </motion.div>
+          <motion.button 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             onClick={() => setIsModalOpen(true)}
-            className="bg-white text-gray-900 px-6 py-3.5 rounded-full font-black text-sm tracking-wide hover:bg-gray-100 transition-all shadow-glow hover:-translate-y-1 w-fit flex items-center gap-2"
+            className="bg-white text-gray-900 px-6 py-3.5 rounded-full font-black text-sm tracking-wide hover:bg-gray-100 transition-all shadow-glow hover:-translate-y-1 active:scale-95 w-fit flex items-center gap-2"
           >
             <span>+</span> ADD NEW VENUE
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -110,8 +131,13 @@ export const VendorDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 -mt-16 relative z-20">
         
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"
+        >
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-default">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full filter blur-xl group-hover:bg-emerald-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -123,9 +149,9 @@ export const VendorDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Total Revenue</p>
             <h3 className="text-3xl font-black text-gray-900 tracking-tight">Ksh {stats.total_revenue.toLocaleString()}</h3>
-          </div>
+          </motion.div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-default">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full filter blur-xl group-hover:bg-blue-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -134,9 +160,9 @@ export const VendorDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Upcoming Bookings</p>
             <h3 className="text-3xl font-black text-gray-900 tracking-tight">{stats.upcoming_bookings} <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">confirmed</span></h3>
-          </div>
+          </motion.div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-default">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full filter blur-xl group-hover:bg-amber-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -145,9 +171,9 @@ export const VendorDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Locyfy Rating</p>
             <h3 className="text-3xl font-black text-gray-900 tracking-tight">4.9 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">/ 5.0</span></h3>
-          </div>
+          </motion.div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+          <motion.div variants={itemVariants} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-default">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full filter blur-xl group-hover:bg-purple-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -156,14 +182,19 @@ export const VendorDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Active Venues</p>
             <h3 className="text-3xl font-black text-gray-900 tracking-tight">{stats.total_venues} <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">listed</span></h3>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Bookings Table */}
-        <div className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden"
+        >
           <div className="p-8 border-b border-gray-50 flex justify-between items-center">
             <h2 className="text-xl font-black text-gray-900">Recent Bookings</h2>
-            <button className="text-[10px] font-black tracking-widest uppercase text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full transition-colors border border-emerald-100">View All</button>
+            <button className="text-[10px] font-black tracking-widest uppercase text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full transition-colors border border-emerald-100 hover:bg-emerald-100">View All</button>
           </div>
           
           <div className="overflow-x-auto">
@@ -184,7 +215,7 @@ export const VendorDashboard: React.FC = () => {
                   </tr>
                 ) : (
                   bookings.map((booking: Booking) => (
-                    <tr key={booking.id} className="hover:bg-gray-50/50 transition-colors group">
+                    <tr key={booking.id} className="hover:bg-gray-50/50 transition-colors group cursor-pointer">
                       <td className="p-5">
                         <span className="font-mono text-sm font-black text-gray-900">#{booking.id}</span>
                       </td>
@@ -210,7 +241,7 @@ export const VendorDashboard: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
 
       </div>
     </div>
