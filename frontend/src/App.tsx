@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { LandingPage } from './pages/LandingPage';
 import { ExploreHub } from './components/venue/ExploreHub';
 import { VenueDetails } from './components/venue/VenueDetails';
@@ -46,7 +47,12 @@ function Navigation() {
   };
 
   return (
-    <div className="fixed w-full top-6 z-50 flex justify-center px-4 animate-fade-in-up">
+    <motion.div 
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.8 }}
+      className="fixed w-full top-6 z-50 flex justify-center px-4"
+    >
       <nav className="glass-dark text-white px-6 py-3.5 rounded-full flex justify-between items-center shadow-glow max-w-4xl w-full transition-all duration-300">
         <Link to="/" className="text-2xl font-black text-emerald-400 tracking-tight hover:text-emerald-300 transition-colors">
           Locyfy<span className="text-white">.</span>
@@ -76,7 +82,7 @@ function Navigation() {
           )}
         </div>
       </nav>
-    </div>
+    </motion.div>
   );
 }
 

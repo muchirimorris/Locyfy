@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Star, MapPin, Users, ShieldCheck } from 'lucide-react';
 import type { Venue } from '../../types/venue';
 
@@ -20,9 +21,13 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onClick }) => {
   } = venue;
 
   return (
-    <div 
+    <motion.div 
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+      }}
       onClick={() => onClick(id)}
-      className="group bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500 cursor-pointer flex flex-col h-full"
+      className="group bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] transition-all duration-500 cursor-pointer flex flex-col h-full"
     >
       {/* Image Section */}
       <div className="relative h-64 w-full overflow-hidden bg-gray-100">
@@ -111,6 +116,6 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onClick }) => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

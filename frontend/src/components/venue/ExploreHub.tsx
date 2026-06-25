@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Search, Filter, SlidersHorizontal, Map, Loader2, AlertCircle } from 'lucide-react';
 import { VenueCard } from './VenueCard';
 import type { Venue } from '../../types/venue';
@@ -71,7 +72,12 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
            <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" style={{ animationDelay: '4s' }}></div>
         </div>
 
-        <div className="max-w-4xl mx-auto relative z-10 text-center animate-fade-in-up">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="max-w-4xl mx-auto relative z-10 text-center"
+        >
           <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-6 drop-shadow-lg">
             Discover Exceptional <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Spaces.</span>
           </h1>
@@ -100,7 +106,7 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
               <span>Map View</span>
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Global Error Banner */}
@@ -199,11 +205,18 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
                 <h3 className="text-lg font-bold text-gray-900">Fetching verified venues...</h3>
              </div>
           ) : filteredVenues.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <motion.div 
+              initial="hidden"
+              animate="show"
+              variants={{
+                show: { transition: { staggerChildren: 0.1 } }
+              }}
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
+            >
               {filteredVenues.map((venue) => (
                 <VenueCard key={venue.id} venue={venue} onClick={(id) => navigate(`/venue/${id}`)} />
               ))}
-            </div>
+            </motion.div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[2rem] border border-gray-100 border-dashed">
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
