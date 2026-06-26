@@ -206,21 +206,37 @@ export const VenueDetails: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Media Gallery</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="col-span-2 md:col-span-2 row-span-2 relative rounded-2xl overflow-hidden group cursor-pointer bg-gray-200 shadow-sm hover:shadow-xl transition-shadow">
-                  <img src={venue.imageUrl || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Event Primary" />
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <motion.img 
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+                    src={venue.imageUrl || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800"} 
+                    className="w-full h-full object-cover" 
+                    alt="Event Primary" 
+                  />
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                      <PlayCircle className="w-12 h-12 text-white drop-shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300" />
                   </div>
                 </div>
                 {venue.images && venue.images.length > 0 ? (
                   venue.images.map((img) => (
                     <div key={img.id} className="rounded-2xl overflow-hidden bg-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                      <img src={img.image_url} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Gallery item" />
+                      <motion.img 
+                        whileHover={{ scale: 1.1, rotate: 2 }}
+                        transition={{ duration: 0.5, type: "spring" }}
+                        src={img.image_url} 
+                        className="w-full h-full object-cover" 
+                        alt="Gallery item" 
+                      />
                     </div>
                   ))
                 ) : (
                   <>
-                    <div className="rounded-2xl overflow-hidden bg-gray-200 shadow-sm hover:shadow-md transition-shadow"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e325?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Placeholder 1" /></div>
-                    <div className="rounded-2xl overflow-hidden bg-gray-200 shadow-sm hover:shadow-md transition-shadow"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Placeholder 2" /></div>
+                    <div className="rounded-2xl overflow-hidden bg-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                      <motion.img whileHover={{ scale: 1.1, rotate: 2 }} transition={{ duration: 0.5, type: "spring" }} src="https://images.unsplash.com/photo-1505236858219-8359eb29e325?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover" alt="Placeholder 1" />
+                    </div>
+                    <div className="rounded-2xl overflow-hidden bg-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                      <motion.img whileHover={{ scale: 1.1, rotate: -2 }} transition={{ duration: 0.5, type: "spring" }} src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=400" className="w-full h-full object-cover" alt="Placeholder 2" />
+                    </div>
                   </>
                 )}
               </div>

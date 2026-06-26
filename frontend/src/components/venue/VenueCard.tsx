@@ -31,12 +31,14 @@ export const VenueCard: React.FC<VenueCardProps> = ({ venue, onClick }) => {
     >
       {/* Image Section */}
       <div className="relative h-64 w-full overflow-hidden bg-gray-100">
-        <img 
+        <motion.img 
+          whileHover={{ scale: 1.15, rotate: 1 }}
+          transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 20 }}
           src={imageUrl || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=600"} 
           alt={name} 
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
         {/* Top Badges */}
         <div className="absolute top-4 left-4 flex gap-2 z-10">
