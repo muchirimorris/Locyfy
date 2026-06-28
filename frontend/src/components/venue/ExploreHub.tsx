@@ -122,7 +122,12 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex flex-col lg:flex-row gap-10">
         
         {/* Sidebar Filters */}
-        <aside className="w-full lg:w-72 flex-shrink-0">
+        <motion.aside 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full lg:w-72 flex-shrink-0"
+        >
           <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 sticky top-28">
             <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
               <Filter className="w-4 h-4 text-emerald-500" /> Filters
@@ -186,7 +191,7 @@ export const ExploreHub: React.FC<ExploreHubProps> = ({ initialVenues }) => {
             </div>
 
           </div>
-        </aside>
+        </motion.aside>
 
         {/* Results Grid */}
         <main className="flex-grow">

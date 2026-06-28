@@ -11,6 +11,7 @@ import { Register } from './components/auth/Register';
 import { useAuthStore } from './store/authStore';
 import type { Venue } from './types/venue';
 import apiClient from './services/apiClient';
+import { CustomCursor } from './components/CustomCursor';
 
 const mockVenues: Venue[] = [
   {
@@ -53,8 +54,8 @@ function Navigation() {
       transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.8 }}
       className="fixed w-full top-6 z-50 flex justify-center px-4"
     >
-      <nav className="glass-dark text-white px-6 py-3.5 rounded-full flex justify-between items-center shadow-glow max-w-4xl w-full transition-all duration-300">
-        <Link to="/" className="text-2xl font-black text-emerald-400 tracking-tight hover:text-emerald-300 transition-colors">
+      <nav className="glass-dark text-white px-6 py-3.5 rounded-full flex justify-between items-center shadow-glow max-w-4xl w-full transition-all duration-300 hover:bg-gray-900/95 hover:shadow-glow-lg hover:scale-[1.01]">
+        <Link to="/" className="text-2xl font-black text-emerald-400 tracking-tight hover:text-emerald-300 transition-colors drop-shadow-md">
           Locyfy<span className="text-white">.</span>
         </Link>
         
@@ -89,7 +90,8 @@ function Navigation() {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <CustomCursor />
+      <div className="min-h-screen flex flex-col cursor-default">
         <Navigation />
 
         <main className="flex-grow">
