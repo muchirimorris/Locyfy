@@ -118,7 +118,13 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* --- MARQUEE SECTION --- */}
-      <div className="py-6 bg-emerald-500 overflow-hidden relative flex whitespace-nowrap border-y border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.5)] z-20">
+      <motion.div 
+        initial={{ opacity: 0, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
+        className="py-6 bg-emerald-500 overflow-hidden relative flex whitespace-nowrap border-y border-white/10 shadow-[0_-20px_40px_rgba(0,0,0,0.5)] z-20"
+      >
         <motion.div 
           animate={{ x: [0, -1035] }}
           transition={{ repeat: Infinity, ease: "linear", duration: 15 }}
@@ -135,16 +141,16 @@ export const LandingPage: React.FC = () => {
             </React.Fragment>
           ))}
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* --- FEATURES SECTION --- */}
       <div className="py-32 relative bg-[#050505] z-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <motion.div 
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 120 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+            transition={{ duration: 1, type: "spring", bounce: 0.4 }}
             className="text-center mb-24"
           >
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 text-white">Engineering <span className="text-emerald-400">Trust.</span></h2>
@@ -177,10 +183,10 @@ export const LandingPage: React.FC = () => {
       {/* --- FOOTER CTA --- */}
       <div className="py-40 relative overflow-hidden bg-[#0a0a0a] border-t border-white/5 z-20">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.9, y: 50 }}
+          initial={{ opacity: 0, scale: 0.8, y: 150 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, type: "spring" }}
+          transition={{ duration: 1.2, type: "spring", bounce: 0.4 }}
           className="max-w-4xl mx-auto px-6 text-center relative z-10"
         >
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-lg bg-emerald-500/20 blur-[120px] rounded-full -z-10"></div>
@@ -205,10 +211,10 @@ export const LandingPage: React.FC = () => {
 
 const FeatureCard = ({ icon, title, description, delay }: { icon: React.ReactNode, title: string, description: string, delay: number }) => (
   <motion.div 
-    initial={{ opacity: 0, y: 50 }}
+    initial={{ opacity: 0, y: 150 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-50px" }}
-    transition={{ type: "spring", stiffness: 100, damping: 20, delay }}
+    transition={{ type: "spring", stiffness: 80, damping: 20, delay }}
     whileHover={{ y: -10, scale: 1.02 }}
     className="bg-white/[0.02] border border-white/5 p-10 rounded-[2rem] hover:bg-white/[0.04] hover:border-emerald-500/30 transition-all duration-300 group relative overflow-hidden backdrop-blur-sm"
   >
