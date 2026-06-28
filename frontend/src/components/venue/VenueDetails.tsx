@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, ShieldCheck, CheckCircle2, PlayCircle, MapPin, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import apiClient from '../../services/apiClient';
 import type { Venue } from '../../types/venue';
 
@@ -72,12 +73,12 @@ export const VenueDetails: React.FC = () => {
 
   const basePrice = Number(venue.pricePerDay);
 
-  const slideUp = {
+  const slideUp: Variants = {
     hidden: { opacity: 0, y: 40 },
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
-  const staggerContainer = {
+  const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
