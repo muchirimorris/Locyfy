@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LandingPage } from './pages/LandingPage';
 import { ExploreHub } from './components/venue/ExploreHub';
 import { VenueDetails } from './components/venue/VenueDetails';
@@ -87,24 +87,47 @@ function Navigation() {
   );
 }
 
+function PageTransition({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, filter: 'blur(10px)', scale: 0.98, y: 20 }}
+      animate={{ opacity: 1, filter: 'blur(0px)', scale: 1, y: 0 }}
+      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.02, y: -20 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path="/explore" element={<PageTransition><ExploreHub initialVenues={mockVenues} /></PageTransition>} />
+        <Route path="/venue/:id" element={<PageTransition><VenueDetails /></PageTransition>} />
+        <Route path="/vendor-dashboard" element={<PageTransition><VendorDashboard /></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><CustomerDashboard /></PageTransition>} />
+        <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+        <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function App() {
   return (
     <Router>
       <CustomCursor />
-      <div className="min-h-screen flex flex-col cursor-default">
+      <div className="min-h-screen flex flex-col cursor-default overflow-x-hidden">
         <Navigation />
 
         <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/explore" element={<ExploreHub initialVenues={mockVenues} />} />
-            <Route path="/venue/:id" element={<VenueDetails />} />
-            <Route path="/vendor-dashboard" element={<VendorDashboard />} />
-            <Route path="/dashboard" element={<CustomerDashboard />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
+          <AnimatedRoutes />
         </main>
       </div>
     </Router>

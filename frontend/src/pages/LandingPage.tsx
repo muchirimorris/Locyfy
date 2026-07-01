@@ -29,22 +29,25 @@ export const LandingPage: React.FC = () => {
   };
 
   const textItemVariants: Variants = {
-    hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
+    hidden: { opacity: 0, y: 100, rotateX: 90, filter: 'blur(20px)', scale: 0.8 },
     show: { 
       opacity: 1, 
       y: 0, 
+      rotateX: 0,
       filter: 'blur(0px)',
-      transition: { type: "spring", stiffness: 100, damping: 20 }
+      scale: 1,
+      transition: { type: "spring", stiffness: 150, damping: 15, mass: 1.5 }
     },
   };
 
   const imageRevealVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.8, y: 100 },
+    hidden: { opacity: 0, scale: 0.5, y: 200, rotate: -20 },
     show: {
       opacity: 1,
       scale: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 80, damping: 25, delay: 0.8 }
+      rotate: 0,
+      transition: { type: "spring", stiffness: 60, damping: 20, delay: 0.6, mass: 2 }
     }
   };
 
