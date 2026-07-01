@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import apiClient from '../../services/apiClient';
 import { CalendarCheck, DollarSign, Loader2, Star, Tent } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface Transaction {
   payment_status?: string;
@@ -91,8 +92,19 @@ export const CustomerDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 -mt-16 relative z-20">
         
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+        <motion.div 
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: { staggerChildren: 0.1 }
+            }
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+        >
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full filter blur-xl group-hover:bg-blue-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -101,9 +113,9 @@ export const CustomerDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Upcoming Events</p>
             <h3 className="text-4xl font-black text-gray-900 tracking-tight">{upcomingBookings.length}</h3>
-          </div>
+          </motion.div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full filter blur-xl group-hover:bg-emerald-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -112,9 +124,9 @@ export const CustomerDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Total Spent</p>
             <h3 className="text-4xl font-black text-gray-900 tracking-tight">Ksh {totalSpent.toLocaleString()}</h3>
-          </div>
+          </motion.div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden group">
             <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full filter blur-xl group-hover:bg-purple-500/20 transition-colors" />
             <div className="flex justify-between items-start mb-6">
               <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center shadow-inner">
@@ -123,8 +135,8 @@ export const CustomerDashboard: React.FC = () => {
             </div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-1">Total Bookings</p>
             <h3 className="text-4xl font-black text-gray-900 tracking-tight">{bookings.length}</h3>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Bookings Table */}
         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">

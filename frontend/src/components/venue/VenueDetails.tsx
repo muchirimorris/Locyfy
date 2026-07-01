@@ -147,7 +147,9 @@ export const VenueDetails: React.FC = () => {
               </div>
               <span className="text-sm font-black text-gray-900 tracking-wider">4.8 (124 Reviews)</span>
             </div>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 if (venue.packages && venue.packages.length > 0) {
                   handleBookNow(venue.packages[0].name, Number(venue.packages[0].price));
@@ -155,10 +157,10 @@ export const VenueDetails: React.FC = () => {
                   handleBookNow("Base Package", basePrice);
                 }
               }}
-              className="px-8 py-4 bg-gray-900 text-white font-black tracking-wide rounded-2xl hover:bg-emerald-500 transition-all shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 active:translate-y-0"
+              className="px-8 py-4 bg-gray-900 text-white font-black tracking-wide rounded-2xl hover:bg-emerald-500 transition-colors shadow-lg hover:shadow-emerald-500/30"
             >
               BOOK NOW
-            </button>
+            </motion.button>
           </div>
         </motion.div>
 
@@ -305,12 +307,14 @@ export const VenueDetails: React.FC = () => {
                         <li key={fIdx} className="flex items-start gap-3 text-sm text-gray-600 font-semibold"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> {feature}</li>
                       ))}
                     </ul>
-                    <button 
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleBookNow(pkg.name, Number(pkg.price))}
-                      className={`w-full py-4 font-black tracking-wide rounded-2xl transition-all active:scale-95 ${index === 0 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-sm' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
+                      className={`w-full py-4 font-black tracking-wide rounded-2xl transition-colors ${index === 0 ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-sm' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
                     >
                       SELECT PACKAGE
-                    </button>
+                    </motion.button>
                   </motion.div>
                 ))
               ) : (
@@ -331,12 +335,14 @@ export const VenueDetails: React.FC = () => {
                     <li className="flex items-start gap-3 text-sm text-gray-600 font-semibold"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Access to grounds</li>
                     <li className="flex items-start gap-3 text-sm text-gray-600 font-semibold"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" /> Standard amenities</li>
                   </ul>
-                  <button 
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => handleBookNow("Base Package", basePrice)}
-                    className="w-full py-4 bg-emerald-50 text-emerald-700 font-black tracking-wide rounded-2xl hover:bg-emerald-100 transition-all hover:-translate-y-0.5 active:scale-95 shadow-sm"
+                    className="w-full py-4 bg-emerald-50 text-emerald-700 font-black tracking-wide rounded-2xl hover:bg-emerald-100 transition-colors shadow-sm"
                   >
                     SELECT PACKAGE
-                  </button>
+                  </motion.button>
                 </motion.div>
               )}
             </motion.div>
